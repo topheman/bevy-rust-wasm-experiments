@@ -7,8 +7,10 @@ use bevy::{
 
 mod debug;
 mod player;
+mod texture;
 use debug::DebugPlugin;
 use player::PlayerPlugin;
+use texture::TexturePlugin;
 
 pub const CLEAR_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
 
@@ -33,6 +35,7 @@ fn main() {
         }))
         .add_startup_system(setup)
         .add_plugin(DebugPlugin)
+        .add_plugin(TexturePlugin)
         .add_plugin(PlayerPlugin)
         .run()
 }
