@@ -37,5 +37,15 @@ Then
 
 ```
 cargo build --release --target wasm32-unknown-unknown
-wasm-bindgen --out-dir ./out/ --target web ./target/wasm32-unknown-unknown/release/bevy-rust-wasm-experiments.wasm
+wasm-bindgen --out-dir ./www/public/out --target web ./target/wasm32-unknown-unknown/release/bevy-rust-wasm-experiments.wasm
 ```
+
+You can run the WebAssembly bundle through a vite setup:
+
+```sh
+cd www
+npm install # only do once
+npm run dev
+```
+
+The `www/public/assets` is a symlink to `assets` so that the WebAssembly bundle will corectly load assets in browser mode.
