@@ -9,3 +9,13 @@ canvas {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+#click-to-start {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 50px
+}
+
+.started #click-to-start {
+  display: none;
+}

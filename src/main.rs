@@ -7,9 +7,11 @@ use bevy::{
 
 mod debug;
 mod player;
+mod resizable;
 mod texture;
 use debug::DebugPlugin;
 use player::PlayerPlugin;
+use resizable::ResizablePlugin;
 use texture::TexturePlugin;
 
 pub const CLEAR_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
@@ -26,7 +28,7 @@ fn main() {
                 width: 600.0,
                 height: 600.0,
                 title: "Bevy Rust Experiments".to_string(),
-                resizable: false,
+                resizable: true,
                 cursor_visible: true,
                 present_mode: PresentMode::AutoVsync,
                 ..default()
@@ -34,6 +36,7 @@ fn main() {
             ..default()
         }))
         .add_startup_system(setup)
+        .add_plugin(ResizablePlugin)
         .add_plugin(DebugPlugin)
         .add_plugin(TexturePlugin)
         .add_plugin(PlayerPlugin)
