@@ -9,10 +9,17 @@ mod debug;
 mod player;
 mod resizable;
 mod texture;
+
+#[cfg(target_arch = "wasm32")]
+mod wasm;
+
 use debug::DebugPlugin;
 use player::PlayerPlugin;
 use resizable::ResizablePlugin;
 use texture::TexturePlugin;
+
+#[cfg(target_arch = "wasm32")]
+use wasm::WasmPlugin;
 
 pub const CLEAR_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
 
@@ -21,8 +28,8 @@ fn setup(mut commands: Commands) {
 }
 
 fn main() {
-    App::new()
-        .insert_resource(ClearColor(CLEAR_COLOR))
+    let mut app = App::new();
+    app.insert_resource(ClearColor(CLEAR_COLOR))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 width: 600.0,
@@ -39,6 +46,10 @@ fn main() {
         .add_plugin(ResizablePlugin)
         .add_plugin(DebugPlugin)
         .add_plugin(TexturePlugin)
-        .add_plugin(PlayerPlugin)
-        .run()
+        .add_plugin(PlayerPlugin);
+
+    #[cfg(target_arch = "wasm32")]
+    app.add_plugin(WasmPlugin);
+
+    app.run()
 }

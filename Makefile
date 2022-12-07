@@ -20,3 +20,21 @@ help:
 	@echo "cd ./www && npm install"
 	@echo ""
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+cargo-run: ## ▶️  Run desktop version in debug mode
+	cargo run
+
+cargo-build: ## ⚙️  Build desktop version
+	cargo build
+
+cargo-run-wasm: ## ▶️  Run wasm version in debug mode via wasm-server-runner
+	@echo "Once started, open http://127.0.0.1:1334/dev.html to access the page with the wasm-bindgen bindings"
+	cargo run --target wasm32-unknown-unknown
+
+wasm-build: ## ⚙️  Build WebAssembly
+	cargo build --release --target wasm32-unknown-unknown
+	wasm-bindgen --out-dir ./www/public/out --target web ./target/wasm32-unknown-unknown/release/bevy-rust-wasm-experiments.wasm
+
+wasm-build-dev: ## ⚙️  Build WebAssembly and launch dev server
+	$(MAKE) wasm-build
+	cd www && npm run dev
