@@ -7,3 +7,6 @@
 function resize_canvas(width, height) {
   console.log(width, height)
 }
+
+// vitejs only accepts <script type="module"/> so we must expose bindings on global scope so they are accessible
+window.resize_canvas = resize_canvas;

@@ -28,7 +28,8 @@ cargo-build: ## ⚙️  Build desktop version
 	cargo build
 
 cargo-run-wasm: ## ▶️  Run wasm version in debug mode via wasm-server-runner
-	@echo "Once started, open http://127.0.0.1:1334/dev.html to access the page with the wasm-bindgen bindings"
+	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:1334/dev.html"
+	@echo ""
 	cargo run --target wasm32-unknown-unknown
 
 wasm-build: ## ⚙️  Build WebAssembly
