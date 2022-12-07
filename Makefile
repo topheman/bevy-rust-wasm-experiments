@@ -27,7 +27,7 @@ cargo-run: ## ▶️  Run desktop version in debug mode
 cargo-build: ## ⚙️  Build desktop version
 	cargo build
 
-cargo-run-wasm: ## ▶️  Run wasm version in debug mode via wasm-server-runner
+cargo-run-wasm: ## ▶️  Run wasm version in debug mode via wasm-server-runner (useful to work on the WebAssembly bindings)
 	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:1334/dev.html"
 	@echo ""
 	cargo run --target wasm32-unknown-unknown
@@ -36,6 +36,6 @@ wasm-build: ## ⚙️  Build WebAssembly
 	cargo build --release --target wasm32-unknown-unknown
 	wasm-bindgen --out-dir ./www/public/out --target web ./target/wasm32-unknown-unknown/release/bevy-rust-wasm-experiments.wasm
 
-wasm-build-dev: ## ⚙️  Build WebAssembly and launch dev server
+wasm-build-dev: ## ⚙️  Build WebAssembly and launch dev server (useful to work on the website generated with vite)
 	$(MAKE) wasm-build
 	cd www && npm run dev
