@@ -50,6 +50,5 @@ fn main() {
 
     #[cfg(target_arch = "wasm32")]
     app.add_plugin(WasmPlugin);
-
     app.run()
 }

@@ -5,7 +5,12 @@
  */
 
 function resize_canvas(width, height) {
-  console.log(width, height)
+  console.log(width, height);
+  const canvas = document.querySelector('canvas');
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  canvas.width = width * window.devicePixelRatio;
+  canvas.height = height * window.devicePixelRatio;
 }
 
 // vitejs only accepts <script type="module"/> so we must expose bindings on global scope so they are accessible
