@@ -21,21 +21,30 @@ help:
 	@echo ""
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-cargo-run: ## ▶️  Run desktop version in debug mode
+desktop-dev: ## ▶️  Run desktop version in development
 	cargo run
 
-cargo-build: ## ⚙️  Build desktop version
+desktop-build: ## ⚙️  Build desktop version
 	cargo build
 
-cargo-run-wasm: ## ▶️  Run wasm version in debug mode via wasm-server-runner (useful to work on the WebAssembly bindings)
+wasm-dev: ## ▶️  Run wasm version in development mode via wasm-server-runner (useful to work on the WebAssembly bindings)
 	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:1334/dev.html"
 	@echo ""
 	cargo run --target wasm32-unknown-unknown
 
-wasm-build: ## ⚙️  Build WebAssembly
+wasm-build: ## ⚙️  Build wasm version
 	cargo build --release --target wasm32-unknown-unknown
 	wasm-bindgen --out-dir ./www/public/out --target web ./target/wasm32-unknown-unknown/release/bevy-rust-wasm-experiments.wasm
 
-wasm-build-dev: ## ⚙️  Build WebAssembly and launch dev server (useful to work on the website generated with vite)
+www-dev: ## ⚙️  Build wasm and launch website dev server via vite
 	$(MAKE) wasm-build
 	cd www && npm run dev
+
+www-build: ## ⚙️  Build wasm and buil website
+	$(MAKE) wasm-build
+	cd www && npm run build
+
+www-preview: ## ▶️  Preview website's build
+	cd www && npm run preview
+
+.PHONY: desktop-build desktop-dev wasm-build wasm-dev www-build www-dev www-preview
