@@ -10,16 +10,10 @@ mod player;
 mod resizable;
 mod texture;
 
-#[cfg(target_arch = "wasm32")]
-mod wasm;
-
 use debug::DebugPlugin;
 use player::PlayerPlugin;
 use resizable::ResizablePlugin;
 use texture::TexturePlugin;
-
-#[cfg(target_arch = "wasm32")]
-use wasm::WasmPlugin;
 
 pub const CLEAR_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
 
@@ -38,6 +32,7 @@ fn main() {
                 resizable: true,
                 cursor_visible: true,
                 present_mode: PresentMode::AutoVsync,
+                fit_canvas_to_parent: true, // no more need to handle this myself with wasm binding: https://github.com/bevyengine/bevy/commit/fed93a0edce9d66586dc70c1207a2092694b9a7d
                 ..default()
             },
             ..default()
@@ -48,7 +43,5 @@ fn main() {
         .add_plugin(TexturePlugin)
         .add_plugin(PlayerPlugin);
 
-    #[cfg(target_arch = "wasm32")]
-    app.add_plugin(WasmPlugin);
     app.run()
 }

@@ -2,6 +2,13 @@ use bevy::prelude::*;
 use bevy::window::WindowResized;
 use wasm_bindgen::prelude::*;
 
+/**
+ * This is dead code.
+ * Not needed anymore after bevy@0.9.1
+ *
+ * See: https://github.com/bevyengine/bevy/commit/fed93a0edce9d66586dc70c1207a2092694b9a7d
+ */
+
 pub struct WasmPlugin;
 
 impl Plugin for WasmPlugin {
