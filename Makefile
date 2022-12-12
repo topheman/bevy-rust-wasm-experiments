@@ -25,7 +25,10 @@ desktop-dev: ## ▶️  Run desktop version in development
 	cargo run
 
 desktop-build: ## ⚙️  Build desktop version
-	cargo build
+	cargo build --release
+	rm -rf ./target/release/assets
+	mkdir ./target/release/assets
+	cp -r ./assets ./target/release
 
 wasm-dev: ## ▶️  Run wasm version in development mode via wasm-server-runner (useful to work on the WebAssembly bindings)
 	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:1334/dev.html"
