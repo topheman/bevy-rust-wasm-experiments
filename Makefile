@@ -33,7 +33,7 @@ desktop-build: ## ⚙️  Build desktop version
 wasm-dev: ## ▶️  Run wasm version in development mode via wasm-server-runner (useful to work on the WebAssembly bindings)
 	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:1334/dev.html"
 	@echo ""
-	cargo run --target wasm32-unknown-unknown
+	WASM_SERVER_RUNNER_ADDRESS=0.0.0.0 cargo run --target wasm32-unknown-unknown
 
 wasm-build: ## ⚙️  Build wasm version
 	cargo build --release --target wasm32-unknown-unknown
