@@ -44,7 +44,7 @@ fn load_assets(
     let texture_handle = asset_server.load("ball-steel-no-shadow.png");
     let texture_atlas = TextureAtlas::from_grid(
         texture_handle,
-        Vec2::new(100.0, 110.0),
+        Vec2::new(100.0, 100.0),
         7,
         1,
         None,
