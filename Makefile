@@ -31,9 +31,17 @@ desktop-build: ## ⚙️  Build desktop version
 	cp -r ./assets ./target/release
 
 wasm-dev: ## ▶️  Run wasm version in development mode via wasm-server-runner (useful to work on the WebAssembly bindings)
-	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:1334/dev.html"
+	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:3000/dev.html"
 	@echo ""
-	WASM_SERVER_RUNNER_ADDRESS=0.0.0.0 cargo run --target wasm32-unknown-unknown
+	WASM_SERVER_RUNNER_ADDRESS=0.0.0.0:3000 cargo run --target wasm32-unknown-unknown
+
+wasm-dev-release: ## ▶️  Run wasm version in development mode via wasm-server-runner (no debug mode - lighter bundle)
+	@echo "Once started, to access the page with the wasm-bindgen bindings, open http://127.0.0.1:3000/dev.html"
+	@echo ""
+	WASM_SERVER_RUNNER_ADDRESS=0.0.0.0:3000 cargo run --release --target wasm32-unknown-unknown
+
+forward: ## ▶️  forwards port 3000 to localhost.run (to access from mobile on a secure origin)
+	ssh -R 80:localhost:3000 localhost.run
 
 wasm-build: ## ⚙️  Build wasm version
 	cargo build --release --target wasm32-unknown-unknown
@@ -41,13 +49,13 @@ wasm-build: ## ⚙️  Build wasm version
 
 www-dev: ## ⚙️  Build wasm and launch website dev server via vite
 	$(MAKE) wasm-build
-	cd www && npm run dev
+	cd www && npm run dev -- --port 3000
 
 www-build: ## ⚙️  Build wasm and buil website
 	$(MAKE) wasm-build
 	cd www && npm run build
 
 www-preview: ## ▶️  Preview website's build
-	cd www && npm run preview
+	cd www && npm run preview -- --port 3000
 
 .PHONY: desktop-build desktop-dev wasm-build wasm-dev www-build www-dev www-preview

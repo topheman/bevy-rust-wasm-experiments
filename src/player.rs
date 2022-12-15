@@ -36,48 +36,10 @@ fn handle_player_input_keyboard(
     }
 }
 
-// fn player_movement(
-//     mut player_query: Query<(&Player, &mut Transform)>,
-//     keyboard: Res<Input<KeyCode>>,
-//     time: Res<Time>,
-// ) {
-//     let (player, mut transform) = player_query.single_mut();
-
-//     if keyboard.pressed(KeyCode::Up) {
-//         transform.translation.y += 1.0 * player.speed * time.delta_seconds();
-//     }
-//     if keyboard.pressed(KeyCode::Down) {
-//         transform.translation.y -= 1.0 * player.speed * time.delta_seconds();
-//     }
-//     if keyboard.pressed(KeyCode::Left) {
-//         transform.translation.x -= 1.0 * player.speed * time.delta_seconds();
-//     }
-//     if keyboard.pressed(KeyCode::Right) {
-//         transform.translation.x += 1.0 * player.speed * time.delta_seconds();
-//     }
-// }
-
-// fn player_collision(
-//     mut player_query: Query<(&Player, &mut Transform)>,
-//     viewport_res: Res<Viewport>,
-// ) {
-//     let (player, mut transform) = player_query.single_mut();
-//     if (transform.translation.y + player.radius / 2.0) > viewport_res.max_y {
-//         transform.translation.y = viewport_res.max_y - player.radius / 2.0;
-//     }
-//     if (transform.translation.y - player.radius / 2.0) < viewport_res.min_y {
-//         transform.translation.y = viewport_res.min_y + player.radius / 2.0;
-//     }
-//     if (transform.translation.x + player.radius / 2.0) > viewport_res.max_x {
-//         transform.translation.x = viewport_res.max_x - player.radius / 2.0;
-//     }
-//     if (transform.translation.x - player.radius / 2.0) < viewport_res.min_x {
-//         transform.translation.x = viewport_res.min_x + player.radius / 2.0;
-//     }
-// }
-
 fn spawn_player(mut commands: Commands, ball_texture: Res<BallTexture>) {
     let player_ball_component = Ball {
+        velocity_x: 30.0,
+        velocity_y: 40.0,
         radius: BALL_DEFAULT_RADIUS * PLAYER_SCALE,
         ..default()
     };
