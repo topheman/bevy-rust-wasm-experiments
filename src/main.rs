@@ -5,11 +5,13 @@ use bevy::{
     window::PresentMode,
 };
 
+mod ball;
 mod debug;
 mod player;
 mod resizable;
 mod texture;
 
+use ball::BallPlugin;
 use debug::DebugPlugin;
 use player::PlayerPlugin;
 use resizable::ResizablePlugin;
@@ -41,7 +43,8 @@ fn main() {
         .add_plugin(ResizablePlugin)
         .add_plugin(DebugPlugin)
         .add_plugin(TexturePlugin)
-        .add_plugin(PlayerPlugin);
+        .add_plugin(PlayerPlugin)
+        .add_plugin(BallPlugin);
 
     app.run()
 }
