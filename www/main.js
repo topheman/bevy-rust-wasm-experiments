@@ -17,6 +17,8 @@ function setup() {
   })
   document.body.classList.add('started');
   window.removeEventListener('click', setup);
+  window.removeEventListener('touchstart', setup);
 }
 
 window.addEventListener('click', setup);
+window.addEventListener('touchstart', setup);

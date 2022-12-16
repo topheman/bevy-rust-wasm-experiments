@@ -49,13 +49,13 @@ wasm-build: ## ⚙️  Build wasm version
 
 www-dev: ## ⚙️  Build wasm and launch website dev server via vite
 	$(MAKE) wasm-build
-	cd www && npm run dev -- --port 3000
+	cd www && npm run dev -- --host --port 3000
 
 www-build: ## ⚙️  Build wasm and buil website
 	$(MAKE) wasm-build
 	cd www && npm run build
 
 www-preview: ## ▶️  Preview website's build
-	cd www && npm run preview -- --port 3000
+	cd www && npm run preview -- --host --port 3000
 
 .PHONY: desktop-build desktop-dev wasm-build wasm-dev www-build www-dev www-preview
