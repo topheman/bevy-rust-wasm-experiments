@@ -2,18 +2,29 @@ use bevy::{prelude::*, window::WindowResized};
 
 pub struct ResizablePlugin;
 
-/**
- * Todo: find a way not to break encapsulation.
- * The viewport resource is exposed to the whole app and can be mutated by any system 💣
- */
 #[derive(Resource)]
 pub struct Viewport {
-    pub width: f32,
-    pub height: f32,
-    pub min_x: f32,
-    pub max_x: f32,
-    pub min_y: f32,
-    pub max_y: f32,
+    width: f32,
+    height: f32,
+    min_x: f32,
+    max_x: f32,
+    min_y: f32,
+    max_y: f32,
+}
+/* Fields above are kept private for encapsulation, only exposing public data via getters */
+impl Viewport {
+    pub fn min_x(&self) -> f32 {
+        return self.min_x;
+    }
+    pub fn max_x(&self) -> f32 {
+        return self.max_x;
+    }
+    pub fn min_y(&self) -> f32 {
+        return self.min_y;
+    }
+    pub fn max_y(&self) -> f32 {
+        return self.max_y;
+    }
 }
 
 impl Default for Viewport {
