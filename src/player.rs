@@ -37,12 +37,7 @@ fn handle_player_input_keyboard(
 }
 
 fn spawn_player(mut commands: Commands, ball_texture: Res<BallTexture>) {
-    let player_ball_component = Ball {
-        velocity_x: 30.0,
-        velocity_y: 40.0,
-        radius: BALL_DEFAULT_RADIUS * PLAYER_SCALE,
-        ..default()
-    };
+    let player_ball_component = Ball::new(30.0, 40.0, BALL_DEFAULT_RADIUS * PLAYER_SCALE);
     let player_entity = spawn_assets_sprite(
         &mut commands,
         &ball_texture,

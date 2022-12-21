@@ -15,12 +15,23 @@ pub struct BallPlugin;
 pub struct Ball {
     pub velocity_x: f32,
     pub velocity_y: f32,
-    pub radius: f32,
-    pub mass: f32,
-    pub gravity: f32,
-    pub elasticity: f32,
-    pub friction: f32,
+    radius: f32,
+    mass: f32,
+    gravity: f32,
+    elasticity: f32,
+    friction: f32,
     pub speed_with_keyboard: f32,
+}
+impl Ball {
+    // public constructor, only expose public fields
+    pub fn new(velocity_x: f32, velocity_y: f32, radius: f32) -> Ball {
+        Ball {
+            velocity_x,
+            velocity_y,
+            radius,
+            ..default()
+        }
+    }
 }
 impl Default for Ball {
     fn default() -> Self {
