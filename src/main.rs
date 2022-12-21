@@ -5,13 +5,15 @@ use bevy::{
     window::PresentMode,
 };
 
+mod audio;
 mod ball;
 mod debug;
 mod player;
 mod resizable;
 mod texture;
 
-use ball::BallPlugin;
+use audio::AudioPlugin;
+use ball::{BallPlugin, CollisionEvent};
 use debug::DebugPlugin;
 use player::PlayerPlugin;
 use resizable::ResizablePlugin;
@@ -44,7 +46,9 @@ fn main() {
         .add_plugin(DebugPlugin)
         .add_plugin(TexturePlugin)
         .add_plugin(PlayerPlugin)
-        .add_plugin(BallPlugin);
+        .add_plugin(BallPlugin)
+        .add_event::<CollisionEvent>()
+        .add_plugin(AudioPlugin);
 
     app.run()
 }
