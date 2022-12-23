@@ -1,20 +1,17 @@
 body, html {
   margin: 0;
   padding: 0;
-  height: 100%;
   width: 100%;
+  height: 100%;
+  background-color: blue;
+}
+
+@media (pointer: none) {
+  body, html {
+    height: 90vh;
+  }
 }
 
 canvas {
   display: block;
-}
-
-#click-to-start {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 50px
-}
-
-.started #click-to-start {
-  display: none;
 }
