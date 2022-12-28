@@ -16,6 +16,8 @@ help:
 	@echo "rustup target install wasm32-unknown-unknown"
 	@echo "cargo install wasm-server-runner"
 	@echo "cargo install wasm-bindgen-cli"
+	@echo "cargo install wasm-opt ${_GRAY}# for .wasm file size optimization${_END}"
+	@echo
 	@echo "${_GRAY}# If you want to do WebAssembly, install the web part${_END}"
 	@echo "cd ./www && npm install"
 	@echo ""
@@ -47,12 +49,23 @@ wasm-build: ## ⚙️  Build wasm version
 	cargo build --release --target wasm32-unknown-unknown
 	wasm-bindgen --out-dir ./www/public/out --target web ./target/wasm32-unknown-unknown/release/bevy-rust-wasm-experiments.wasm
 
+wasm-opt: ## 🔩 Optimize wasm file size
+	wasm-opt -Os -o ./www/public/out/bevy-rust-wasm-experiments_bg.wasm ./www/public/out/bevy-rust-wasm-experiments_bg.wasm
+
+wasm-build-opt: ## ⚙️  Build wasm version with optimized file size
+	$(MAKE) wasm-build
+	$(MAKE) wasm-opt
+
 www-dev: ## ⚙️  Build wasm and launch website dev server via vite
 	$(MAKE) wasm-build
 	cd www && npm run dev -- --host --port 3000
 
 www-build: ## ⚙️  Build wasm and buil website
 	$(MAKE) wasm-build
+	cd www && npm run build
+
+www-build-opt: ## ⚙️  Build wasm (optimized wasm file size) and build website
+	$(MAKE) wasm-build-opt
 	cd www && npm run build
 
 www-preview: ## ▶️  Preview website's build

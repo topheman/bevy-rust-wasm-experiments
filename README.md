@@ -31,6 +31,7 @@ Install [wasm-bindgen-cli](https://rustwasm.github.io/docs/wasm-bindgen/referenc
 
 ```
 cargo install wasm-bindgen-cli
+cargo install wasm-opt
 ```
 
 Then

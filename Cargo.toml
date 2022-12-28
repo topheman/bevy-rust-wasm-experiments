@@ -15,6 +15,9 @@ version = "0.3.60"
 features = ['Window']
 
 # https://bevyengine.org/learn/book/getting-started/setup/#compile-with-performance-optimizations
+[profile.release]
+opt-level = 's'
+lto = "thin"
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
