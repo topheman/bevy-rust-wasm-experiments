@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::ball::Ball;
 use crate::texture::{spawn_assets_sprite, BallTexture};
@@ -7,6 +8,12 @@ pub const PLAYER_SCALE: f32 = 1.0;
 pub const BALL_DEFAULT_RADIUS: f32 = 100.0;
 
 pub struct PlayerPlugin;
+
+#[wasm_bindgen]
+extern "C" {
+    fn get_orientation_x() -> f32;
+    fn get_orientation_y() -> f32;
+}
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
@@ -33,6 +40,15 @@ fn handle_player_input_keyboard(
     }
     if keyboard.pressed(KeyCode::Right) {
         ball.velocity_x += ball.speed_with_keyboard * time.delta_seconds();
+    }
+
+    // mobile with accelerometer
+    // todo fix ball/wall collision - velocity should be incremented ?
+    let orientation_x = get_orientation_x();
+    let orientation_y = get_orientation_y();
+    if orientation_x != 0.0 && orientation_y != 0.0 {
+        ball.velocity_x = orientation_x * ball.speed_with_keyboard;
+        ball.velocity_y = orientation_y * ball.speed_with_keyboard;
     }
 }
 

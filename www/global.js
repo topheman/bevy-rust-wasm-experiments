@@ -15,3 +15,62 @@ function resize_canvas(width, height) {
 
 // vitejs only accepts <script type="module"/> so we must expose bindings on global scope so they are accessible
 window.resize_canvas = resize_canvas;
+
+/**
+ * Track orientation
+ */
+const _orientation = {
+  x: 0,
+  y: 0,
+}
+
+/**
+ * Expose orientation to rust via wasm
+ */
+window.get_orientation_x = function () {
+  return _orientation.x;
+}
+window.get_orientation_y = function () {
+  return _orientation.y;
+}
+
+setInterval(() => {
+  console.log(_orientation);
+}, 200)
+
+function onDeviceOrientation(event) {
+  _orientation.x = event.gamma / 90;
+  _orientation.y = -event.beta / 90;
+}
+
+const requestAccessAsync = async () => {
+  if (typeof DeviceOrientationEvent === "undefined") {
+    console.log("Device orientation event is not supported by your browser");
+    return false;
+  }
+
+  if (
+    DeviceOrientationEvent.requestPermission &&
+    typeof DeviceMotionEvent.requestPermission === "function"
+  ) {
+    let permission;
+    try {
+      permission = await DeviceOrientationEvent.requestPermission();
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+    if (permission !== "granted") {
+      console.error("Request to access the device orientation was rejected", { permission });
+      return false;
+    }
+  }
+
+  window.addEventListener("deviceorientation", onDeviceOrientation);
+
+  return true;
+};
+
+document.body.addEventListener('click', () => {
+  requestAccessAsync()
+}, { once: true })
