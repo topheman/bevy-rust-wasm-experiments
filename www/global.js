@@ -71,6 +71,6 @@ const requestAccessAsync = async () => {
   return true;
 };
 
-document.body.addEventListener('click', () => {
+window.addEventListener('click', () => {
   requestAccessAsync()
 }, { once: true })

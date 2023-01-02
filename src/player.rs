@@ -47,8 +47,8 @@ fn handle_player_input_keyboard(
     let orientation_x = get_orientation_x();
     let orientation_y = get_orientation_y();
     if orientation_x != 0.0 && orientation_y != 0.0 {
-        ball.velocity_x = orientation_x * ball.speed_with_keyboard;
-        ball.velocity_y = orientation_y * ball.speed_with_keyboard;
+        ball.velocity_x += orientation_x * ball.speed_with_accelerometer * time.delta_seconds();
+        ball.velocity_y += orientation_y * ball.speed_with_accelerometer * time.delta_seconds();
     }
 }
 

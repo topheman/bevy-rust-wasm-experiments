@@ -19,8 +19,9 @@ pub struct Ball {
     mass: f32,
     gravity: f32,
     elasticity: f32,
-    friction: f32,
+    pub friction: f32,
     pub speed_with_keyboard: f32,
+    pub speed_with_accelerometer: f32,
 }
 impl Ball {
     // public constructor, only expose public fields
@@ -44,6 +45,7 @@ impl Default for Ball {
             elasticity: 0.98,
             friction: 0.8,
             speed_with_keyboard: 200.0,
+            speed_with_accelerometer: 400.0,
         }
     }
 }
