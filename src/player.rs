@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::ball::Ball;
@@ -9,10 +10,21 @@ pub const BALL_DEFAULT_RADIUS: f32 = 100.0;
 
 pub struct PlayerPlugin;
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 extern "C" {
     fn get_orientation_x() -> f32;
     fn get_orientation_y() -> f32;
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn get_orientation_x() -> f32 {
+    return 0.0;
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn get_orientation_y() -> f32 {
+    return 0.0;
 }
 
 impl Plugin for PlayerPlugin {
