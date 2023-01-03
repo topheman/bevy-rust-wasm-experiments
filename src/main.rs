@@ -10,6 +10,7 @@ mod ball;
 mod debug;
 mod player;
 mod resizable;
+mod state;
 mod texture;
 
 use audio::AudioPlugin;
@@ -17,6 +18,7 @@ use ball::{BallPlugin, CollisionEvent};
 use debug::DebugPlugin;
 use player::PlayerPlugin;
 use resizable::ResizablePlugin;
+use state::StatePlugin;
 use texture::TexturePlugin;
 
 pub const CLEAR_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
@@ -43,6 +45,7 @@ fn main() {
             ..default()
         }))
         .add_startup_system(setup)
+        .add_plugin(StatePlugin)
         .add_plugin(ResizablePlugin)
         .add_plugin(DebugPlugin)
         .add_plugin(TexturePlugin)
