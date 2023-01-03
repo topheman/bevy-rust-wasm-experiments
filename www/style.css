@@ -12,6 +12,18 @@ body, html {
   }
 }
 
-canvas {
+canvas#bevy {
+  display: none;
+}
+
+.playing canvas#bevy {
   display: block;
+}
+
+#presentation {
+  display: block;
+}
+
+.playing #presentation {
+  display: none;
 }

@@ -37,6 +37,7 @@ fn main() {
                 cursor_visible: true,
                 present_mode: PresentMode::AutoVsync,
                 fit_canvas_to_parent: true, // no more need to handle this myself with wasm binding: https://github.com/bevyengine/bevy/commit/fed93a0edce9d66586dc70c1207a2092694b9a7d
+                canvas: Some("#bevy".to_string()),
                 ..default()
             },
             ..default()

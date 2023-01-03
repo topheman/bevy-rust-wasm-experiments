@@ -7,13 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:,">
     <title>bevy-rust-wasm-experiments</title>
-    <!-- specific (in order to expose the same external JavaScript bindings declared via wasm-bindgen also in dev mode - same for style) -->
-    <script src="./www/global.js"></script>
-    <link rel="stylesheet" href="./www/style.css">
-    <!-- end specific -->
 </head>
 
-<body>
+<body class="playing">
     <script type="module">
         import init from "./api/wasm.js";
 
@@ -113,6 +109,11 @@
             });
         })();
     </script>
+    <!-- specific (in order to expose the same external JavaScript bindings declared via wasm-bindgen also in dev mode - same for style) -->
+    <script src="./www/global.js"></script>
+    <link rel="stylesheet" href="./www/style.css">
+    <canvas id="bevy"></canvas>
+    <!-- end specific -->
 </body>
 
 </html>
