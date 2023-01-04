@@ -1,8 +1,10 @@
 use bevy::prelude::*;
+use iyes_loopless::prelude::IntoConditionalSystem;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::ball::Ball;
+use crate::state::GameState;
 use crate::texture::{spawn_assets_sprite, BallTexture};
 
 pub const PLAYER_SCALE: f32 = 1.0;
@@ -30,7 +32,7 @@ fn get_orientation_y() -> f32 {
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_player)
-            .add_system(handle_player_input_keyboard);
+            .add_system(handle_player_input_keyboard.run_in_state(GameState::Playing));
     }
 }
 

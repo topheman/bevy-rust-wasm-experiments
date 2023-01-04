@@ -6,8 +6,10 @@
  */
 use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
+use iyes_loopless::prelude::IntoConditionalSystem;
 
 use crate::resizable::Viewport;
+use crate::state::GameState;
 
 pub struct BallPlugin;
 
@@ -54,18 +56,11 @@ pub enum CollisionEvent {
     BallWall,
 }
 
-#[derive(SystemLabel)]
-enum SystemLabel {
-    MoveBalls,
-    HandleBallBallCollisions,
-    HandleBallWallCollisions,
-}
-
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(handle_ball_ball_collisions.label(SystemLabel::HandleBallBallCollisions))
-            .add_system(handle_ball_wall_collisions.label(SystemLabel::HandleBallWallCollisions))
-            .add_system(move_balls_one_step.label(SystemLabel::MoveBalls));
+        app.add_system(handle_ball_ball_collisions.run_in_state(GameState::Playing))
+            .add_system(handle_ball_wall_collisions.run_in_state(GameState::Playing))
+            .add_system(move_balls_one_step.run_in_state(GameState::Playing));
     }
 }
 
