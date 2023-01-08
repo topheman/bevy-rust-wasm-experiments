@@ -4,6 +4,7 @@ use iyes_loopless::prelude::*;
 #[derive(Clone, Hash, Eq, PartialEq, Debug)]
 pub enum GameState {
     HomePage,
+    PrepareGame,
     Playing,
     Pause,
     GameOver,
@@ -18,7 +19,11 @@ impl Plugin for StatePlugin {
     }
 }
 
-fn start_game(mut commands: Commands) {
+fn new_game(mut commands: Commands) {
+    commands.insert_resource(NextState(GameState::PrepareGame))
+}
+
+pub fn start_game(mut commands: Commands) {
     commands.insert_resource(NextState(GameState::Playing))
 }
 
@@ -35,6 +40,9 @@ fn on_click_page(
     buttons: Res<Input<MouseButton>>,
     commands: Commands,
 ) {
+    if gamestate.0 == GameState::HomePage && buttons.just_pressed(MouseButton::Left) {
+        return new_game(commands);
+    }
     if gamestate.0 == GameState::HomePage && buttons.just_pressed(MouseButton::Left) {
         return start_game(commands);
     }
