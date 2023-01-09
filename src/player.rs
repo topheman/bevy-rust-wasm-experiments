@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use iyes_loopless::prelude::{AppLooplessStateExt, IntoConditionalSystem};
+use iyes_loopless::prelude::{AppLooplessStateExt, CurrentState, IntoConditionalSystem};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -66,7 +66,11 @@ fn handle_player_input_keyboard(
     }
 }
 
-fn spawn_player(mut commands: Commands, ball_texture: Res<BallTexture>) {
+fn spawn_player(
+    mut commands: Commands,
+    ball_texture: Res<BallTexture>,
+    gamestate: Res<CurrentState<GameState>>,
+) {
     let player_ball_component = Ball::new(30.0, 40.0, BALL_DEFAULT_RADIUS * PLAYER_SCALE);
     let player_entity = spawn_assets_sprite(
         &mut commands,
@@ -83,5 +87,5 @@ fn spawn_player(mut commands: Commands, ball_texture: Res<BallTexture>) {
         .insert(Name::new("Player"));
 
     // once the player is ready, lets start the game - if we need other resources, start game after spawning them
-    start_game(commands);
+    start_game(commands, gamestate);
 }
