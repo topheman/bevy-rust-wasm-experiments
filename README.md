@@ -50,3 +50,8 @@ npm run dev
 ```
 
 The `www/public/assets` is a symlink to `assets` so that the WebAssembly bundle will corectly load assets in browser mode.
+
+## Assets
+
+- `assets/ball-steel-no-shadow.png`: https://github.com/topheman/gopher-ball/tree/master/assets/imgs
+- `assets/impactMetal_heavy_004.ogg`: https://www.kenney.nl/assets/impact-sounds
