@@ -42,8 +42,11 @@ wasm-dev-release: ## ▶️  Run wasm version in development mode via wasm-serve
 	@echo ""
 	WASM_SERVER_RUNNER_ADDRESS=0.0.0.0:3000 cargo run --release --target wasm32-unknown-unknown
 
-forward: ## ▶️  forwards port 3000 to localhost.run (to access from mobile on a secure origin)
+forward-fallback: ## ▶️  forwards port 3000 to localhost.run (to access from mobile on a secure origin)
 	ssh -R 80:localhost:3000 localhost.run
+
+forward: ## ▶️  forwards port 3000 to ngrok (to access from mobile on a secure origin)
+	@command -v ngrok &> /dev/null && ngrok http 3000 || echo "${_BOLD}ngrok could not be found${_END} - infos to install it are available here: https://ngrok.com\nIf you don't wish to install it, you can use ${_BOLD}make forward-fallback${_END}"
 
 wasm-build: ## ⚙️  Build wasm version
 	cargo build --release --target wasm32-unknown-unknown
