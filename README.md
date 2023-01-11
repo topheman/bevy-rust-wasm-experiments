@@ -56,3 +56,4 @@ The `www/public/assets` is a symlink to `assets` so that the WebAssembly bundle 
 - `assets/ball-steel-no-shadow.png`: https://github.com/topheman/gopher-ball/tree/master/assets/imgs
 - `assets/impactMetal_heavy_004.ogg`: https://www.kenney.nl/assets/impact-sounds
 - `assets/ThaleahFat.ttf`: https://tinyworlds.itch.io/free-pixel-font-thaleah
+- `assets/m6x11.ttf`: https://managore.itch.io/m6x11

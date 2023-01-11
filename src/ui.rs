@@ -10,6 +10,7 @@ impl Plugin for UiPlugin {
         app.add_enter_system(GameState::HomePage, home_page)
             .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
             .add_exit_system(GameState::HomePage, despawn_with::<Title>)
+            // .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
             .add_enter_system(GameState::Playing, playing)
             .add_enter_system(GameState::Pause, pause);
     }
@@ -23,6 +24,9 @@ struct StartGameButton;
 
 #[derive(Component)]
 struct Title;
+
+#[derive(Component)]
+struct Welcome;
 
 /// Despawn all entities with a given component type
 fn despawn_with<T: Component>(mut commands: Commands, q: Query<Entity, With<T>>) {
@@ -74,6 +78,32 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
             ..default()
         }),
         Title,
+    ));
+
+    // welcome
+    commands.spawn((
+        // Create a TextBundle that has a Text with a single section.
+        TextBundle::from_section(
+            // Accepts a `String` or any type that converts into a `String`, such as `&str`
+            "H: back to home page\nP: pause\nSPACE/TAP: slow down the ball\nARROW keys: move the ball\n\nOn mobile, tilt your device",
+            TextStyle {
+                font: ass.load("m6x11.ttf"),
+                font_size: 24.0,
+                color: Color::WHITE,
+            },
+        ) // Set the alignment of the Text
+        .with_text_alignment(TextAlignment::TOP_LEFT)
+        // Set the style of the TextBundle itself.
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                top: Val::Px(15.0),
+                left: Val::Px(15.0),
+                ..default()
+            },
+            ..default()
+        }),
+        Welcome,
     ));
 
     let menu = commands
