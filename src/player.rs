@@ -55,6 +55,10 @@ fn handle_player_input_keyboard(
     if keyboard.pressed(KeyCode::Right) {
         ball.velocity_x += ball.speed_with_keyboard * time.delta_seconds();
     }
+    if keyboard.pressed(KeyCode::Space) {
+        ball.velocity_x = ball.velocity_x * 0.98;
+        ball.velocity_y = ball.velocity_y * 0.98;
+    }
 
     // mobile with accelerometer
     // todo fix ball/wall collision - velocity should be incremented ?
