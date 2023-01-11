@@ -9,6 +9,7 @@ impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_enter_system(GameState::HomePage, home_page)
             .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
+            .add_exit_system(GameState::HomePage, despawn_with::<Title>)
             .add_enter_system(GameState::Playing, playing)
             .add_enter_system(GameState::Pause, pause);
     }
@@ -18,10 +19,10 @@ impl Plugin for UiPlugin {
 struct MainMenu;
 
 #[derive(Component)]
-struct ExitButt;
+struct StartGameButton;
 
 #[derive(Component)]
-struct EnterButt;
+struct Title;
 
 /// Despawn all entities with a given component type
 fn despawn_with<T: Component>(mut commands: Commands, q: Query<Entity, With<T>>) {
@@ -34,6 +35,7 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
     println!("home_page");
     let mut camera = query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(1.0, 0.0, 0.0));
+
     let butt_style = Style {
         justify_content: JustifyContent::Center,
         align_items: AlignItems::Center,
@@ -47,6 +49,32 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
         font_size: 24.0,
         color: Color::BLACK,
     };
+
+    // title
+    commands.spawn((
+        // Create a TextBundle that has a Text with a single section.
+        TextBundle::from_section(
+            // Accepts a `String` or any type that converts into a `String`, such as `&str`
+            "bevy-rust-\nwasm-experiments",
+            TextStyle {
+                font: ass.load("ThaleahFat.ttf"),
+                font_size: 35.0,
+                color: Color::WHITE,
+            },
+        ) // Set the alignment of the Text
+        .with_text_alignment(TextAlignment::TOP_CENTER)
+        // Set the style of the TextBundle itself.
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                bottom: Val::Px(5.0),
+                right: Val::Px(15.0),
+                ..default()
+            },
+            ..default()
+        }),
+        Title,
+    ));
 
     let menu = commands
         .spawn((
@@ -66,41 +94,23 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
         ))
         .id();
 
-    let butt_enter = commands
+    let start_game_button = commands
         .spawn((
             ButtonBundle {
                 style: butt_style.clone(),
                 ..Default::default()
             },
-            EnterButt,
+            StartGameButton,
         ))
         .with_children(|btn| {
             btn.spawn(TextBundle {
-                text: Text::from_section("Enter Game", butt_textstyle.clone()),
+                text: Text::from_section("Start Game", butt_textstyle.clone()),
                 ..Default::default()
             });
         })
         .id();
 
-    let butt_exit = commands
-        .spawn((
-            ButtonBundle {
-                style: butt_style.clone(),
-                ..Default::default()
-            },
-            ExitButt,
-        ))
-        .with_children(|btn| {
-            btn.spawn(TextBundle {
-                text: Text::from_section("Exit Game", butt_textstyle.clone()),
-                ..Default::default()
-            });
-        })
-        .id();
-
-    commands
-        .entity(menu)
-        .push_children(&[butt_enter, butt_exit]);
+    commands.entity(menu).push_children(&[start_game_button]);
 }
 
 fn playing(mut query: Query<&mut Camera2d>) {
