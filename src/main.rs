@@ -1,4 +1,5 @@
 use bevy::{
+    core_pipeline::clear_color::ClearColorConfig,
     // diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     prelude::*,
     // render::render_resource::Texture,
@@ -12,6 +13,7 @@ mod player;
 mod resizable;
 mod state;
 mod texture;
+mod ui;
 
 use audio::AudioPlugin;
 use ball::{BallPlugin, CollisionEvent};
@@ -20,11 +22,17 @@ use player::PlayerPlugin;
 use resizable::ResizablePlugin;
 use state::StatePlugin;
 use texture::TexturePlugin;
+use ui::UiPlugin;
 
 pub const CLEAR_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle {
+        camera_2d: Camera2d {
+            clear_color: ClearColorConfig::Custom(Color::rgb(1.0, 0.0, 0.0)),
+        },
+        ..default()
+    });
 }
 
 fn main() {
@@ -52,6 +60,7 @@ fn main() {
         .add_plugin(PlayerPlugin)
         .add_plugin(BallPlugin)
         .add_event::<CollisionEvent>()
+        .add_plugin(UiPlugin)
         .add_plugin(AudioPlugin);
 
     app.run()
