@@ -12,7 +12,8 @@ impl Plugin for UiPlugin {
             .add_exit_system(GameState::HomePage, despawn_with::<Title>)
             // .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
             .add_enter_system(GameState::Playing, playing)
-            .add_enter_system(GameState::Pause, pause);
+            .add_enter_system(GameState::Pause, pause)
+            .add_exit_system(GameState::Pause, despawn_with::<MainMenu>);
     }
 }
 
@@ -20,7 +21,7 @@ impl Plugin for UiPlugin {
 struct MainMenu;
 
 #[derive(Component)]
-struct StartGameButton;
+struct GameButton;
 
 #[derive(Component)]
 struct Title;
@@ -35,11 +36,7 @@ fn despawn_with<T: Component>(mut commands: Commands, q: Query<Entity, With<T>>)
     }
 }
 
-fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
-    println!("home_page");
-    let mut camera = query.single_mut();
-    camera.clear_color = ClearColorConfig::Custom(Color::rgb(1.0, 0.0, 0.0));
-
+fn make_button(content: &str, mut commands: Commands, ass: Res<AssetServer>) {
     let butt_style = Style {
         justify_content: JustifyContent::Center,
         align_items: AlignItems::Center,
@@ -53,6 +50,48 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
         font_size: 24.0,
         color: Color::BLACK,
     };
+
+    let menu = commands
+        .spawn((
+            NodeBundle {
+                background_color: BackgroundColor(Color::rgb(0.5, 0.5, 0.5)),
+                style: Style {
+                    size: Size::new(Val::Auto, Val::Auto),
+                    margin: UiRect::all(Val::Auto),
+                    align_self: AlignSelf::Center,
+                    flex_direction: FlexDirection::Column,
+                    justify_content: JustifyContent::Center,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            MainMenu,
+        ))
+        .id();
+
+    let start_game_button = commands
+        .spawn((
+            ButtonBundle {
+                style: butt_style.clone(),
+                ..Default::default()
+            },
+            GameButton,
+        ))
+        .with_children(|btn| {
+            btn.spawn(TextBundle {
+                text: Text::from_section(content, butt_textstyle.clone()),
+                ..Default::default()
+            });
+        })
+        .id();
+
+    commands.entity(menu).push_children(&[start_game_button]);
+}
+
+fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
+    println!("home_page");
+    let mut camera = query.single_mut();
+    camera.clear_color = ClearColorConfig::Custom(Color::rgb(1.0, 0.0, 0.0));
 
     // title
     commands.spawn((
@@ -105,42 +144,7 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
         }),
         Welcome,
     ));
-
-    let menu = commands
-        .spawn((
-            NodeBundle {
-                background_color: BackgroundColor(Color::rgb(0.5, 0.5, 0.5)),
-                style: Style {
-                    size: Size::new(Val::Auto, Val::Auto),
-                    margin: UiRect::all(Val::Auto),
-                    align_self: AlignSelf::Center,
-                    flex_direction: FlexDirection::Column,
-                    justify_content: JustifyContent::Center,
-                    ..Default::default()
-                },
-                ..Default::default()
-            },
-            MainMenu,
-        ))
-        .id();
-
-    let start_game_button = commands
-        .spawn((
-            ButtonBundle {
-                style: butt_style.clone(),
-                ..Default::default()
-            },
-            StartGameButton,
-        ))
-        .with_children(|btn| {
-            btn.spawn(TextBundle {
-                text: Text::from_section("Start Game", butt_textstyle.clone()),
-                ..Default::default()
-            });
-        })
-        .id();
-
-    commands.entity(menu).push_children(&[start_game_button]);
+    make_button("Start Game", commands, ass);
 }
 
 fn playing(mut query: Query<&mut Camera2d>) {
@@ -149,8 +153,9 @@ fn playing(mut query: Query<&mut Camera2d>) {
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.0, 0.5, 0.0));
 }
 
-fn pause(mut query: Query<&mut Camera2d>) {
+fn pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
     println!("pause");
     let mut camera = query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.5, 0.0, 0.5));
+    make_button("Pause", commands, ass)
 }
