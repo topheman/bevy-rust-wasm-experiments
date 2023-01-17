@@ -1,3 +1,5 @@
+use std::borrow::{Borrow, BorrowMut};
+
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use iyes_loopless::prelude::*;
 
@@ -36,7 +38,40 @@ fn despawn_with<T: Component>(mut commands: Commands, q: Query<Entity, With<T>>)
     }
 }
 
-fn make_button(content: &str, mut commands: Commands, ass: Res<AssetServer>) {
+fn instuctions<'a, 'b>(mut commands: Commands<'a, 'b>, ass: &Res<AssetServer>) -> Commands<'a, 'b> {
+    // welcome
+    commands.spawn((
+        // Create a TextBundle that has a Text with a single section.
+        TextBundle::from_section(
+            // Accepts a `String` or any type that converts into a `String`, such as `&str`
+            "H: back to home page\nP: pause\nSPACE/TAP: slow down the ball\nARROW keys: move the ball\n\nOn mobile, tilt your device",
+            TextStyle {
+                font: ass.load("m6x11.ttf"),
+                font_size: 24.0,
+                color: Color::WHITE,
+            },
+        ) // Set the alignment of the Text
+        .with_text_alignment(TextAlignment::TOP_LEFT)
+        // Set the style of the TextBundle itself.
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            position: UiRect {
+                top: Val::Px(15.0),
+                left: Val::Px(15.0),
+                ..default()
+            },
+            ..default()
+        }),
+        Welcome,
+    ));
+    return commands;
+}
+
+fn make_button<'a, 'b>(
+    content: &str,
+    mut commands: Commands<'a, 'b>,
+    ass: &Res<AssetServer>,
+) -> Commands<'a, 'b> {
     let butt_style = Style {
         justify_content: JustifyContent::Center,
         align_items: AlignItems::Center,
@@ -86,6 +121,8 @@ fn make_button(content: &str, mut commands: Commands, ass: Res<AssetServer>) {
         .id();
 
     commands.entity(menu).push_children(&[start_game_button]);
+
+    return commands;
 }
 
 fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
@@ -119,32 +156,9 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
         Title,
     ));
 
-    // welcome
-    commands.spawn((
-        // Create a TextBundle that has a Text with a single section.
-        TextBundle::from_section(
-            // Accepts a `String` or any type that converts into a `String`, such as `&str`
-            "H: back to home page\nP: pause\nSPACE/TAP: slow down the ball\nARROW keys: move the ball\n\nOn mobile, tilt your device",
-            TextStyle {
-                font: ass.load("m6x11.ttf"),
-                font_size: 24.0,
-                color: Color::WHITE,
-            },
-        ) // Set the alignment of the Text
-        .with_text_alignment(TextAlignment::TOP_LEFT)
-        // Set the style of the TextBundle itself.
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            position: UiRect {
-                top: Val::Px(15.0),
-                left: Val::Px(15.0),
-                ..default()
-            },
-            ..default()
-        }),
-        Welcome,
-    ));
-    make_button("Start Game", commands, ass);
+    let mut commands2 = instuctions(commands, &ass);
+
+    make_button("Start Game", commands2, &ass);
 }
 
 fn playing(mut query: Query<&mut Camera2d>) {
@@ -157,5 +171,5 @@ fn pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<Asset
     println!("pause");
     let mut camera = query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.5, 0.0, 0.5));
-    make_button("Pause", commands, ass)
+    make_button("Pause", commands, &ass);
 }
