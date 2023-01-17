@@ -1,5 +1,3 @@
-use std::borrow::{Borrow, BorrowMut};
-
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use iyes_loopless::prelude::*;
 
@@ -23,7 +21,7 @@ impl Plugin for UiPlugin {
 struct MainMenu;
 
 #[derive(Component)]
-struct GameButton;
+struct MainButton;
 
 #[derive(Component)]
 struct Title;
@@ -110,7 +108,7 @@ fn make_button<'a, 'b>(
                 style: butt_style.clone(),
                 ..Default::default()
             },
-            GameButton,
+            MainButton,
         ))
         .with_children(|btn| {
             btn.spawn(TextBundle {
