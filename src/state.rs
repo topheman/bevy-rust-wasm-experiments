@@ -73,16 +73,16 @@ fn on_click_page(
     buttons: Res<Input<MouseButton>>,
     commands: Commands,
 ) {
-    if gamestate.0 == GameState::HomePage && buttons.just_pressed(MouseButton::Left) {
-        return new_game(commands, gamestate);
-    }
-    if gamestate.0 == GameState::PrepareGame && buttons.just_pressed(MouseButton::Left) {
-        return start_game(commands, gamestate);
-    }
-    if gamestate.0 == GameState::Playing && buttons.just_pressed(MouseButton::Left) {
-        return pause_game(commands, gamestate);
-    }
-    if gamestate.0 == GameState::Pause && buttons.just_pressed(MouseButton::Left) {
-        return resume_game(commands, gamestate);
-    }
+    // if gamestate.0 == GameState::HomePage && buttons.just_pressed(MouseButton::Left) {
+    //     return new_game(commands, gamestate);
+    // }
+    // if gamestate.0 == GameState::PrepareGame && buttons.just_pressed(MouseButton::Left) {
+    //     return start_game(commands, gamestate);
+    // }
+    // if gamestate.0 == GameState::Playing && buttons.just_pressed(MouseButton::Left) {
+    //     return pause_game(commands, gamestate);
+    // }
+    // if gamestate.0 == GameState::Pause && buttons.just_pressed(MouseButton::Left) {
+    //     return resume_game(commands, gamestate);
+    // }
 }

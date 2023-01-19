@@ -1,7 +1,7 @@
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use iyes_loopless::prelude::*;
 
-use crate::state::GameState;
+use crate::state::{new_game, pause_game, resume_game, start_game, GameState};
 
 pub struct UiPlugin;
 
@@ -14,7 +14,11 @@ impl Plugin for UiPlugin {
             .add_enter_system(GameState::Playing, playing)
             .add_enter_system(GameState::Pause, pause)
             .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
-            .add_exit_system(GameState::Pause, despawn_with::<MainMenu>);
+            .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
+            .add_system(on_click_main_btn.run_in_state(GameState::HomePage))
+            .add_system(on_click_main_btn.run_in_state(GameState::Pause))
+            .add_system(on_click_pause_btn.run_in_state(GameState::Playing))
+            .add_system(on_click_pause_btn.run_in_state(GameState::Pause));
     }
 }
 
@@ -22,7 +26,7 @@ impl Plugin for UiPlugin {
 struct MainMenu;
 
 #[derive(Component)]
-struct MainButton;
+pub struct MainButton;
 
 #[derive(Component)]
 struct Title;
@@ -34,10 +38,10 @@ struct Welcome;
 struct TopMenu;
 
 #[derive(Component)]
-struct PauseButton;
+pub struct PauseButton;
 
 #[derive(Component)]
-struct HomeButton;
+pub struct HomeButton;
 
 /// Despawn all entities with a given component type
 fn despawn_with<T: Component>(mut commands: Commands, q: Query<Entity, With<T>>) {
@@ -263,4 +267,48 @@ fn pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<Asset
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.5, 0.0, 0.5));
     let mut commands2 = make_button("Pause", commands, &ass);
     instuctions(commands2, &ass);
+}
+
+fn on_click_main_btn(
+    gamestate: Res<CurrentState<GameState>>,
+    query: Query<(&Interaction, With<MainButton>)>,
+    commands: Commands,
+    mut windows: ResMut<Windows>,
+) {
+    println!("on_click_main_btn");
+    let (interaction, ()) = query.single();
+    let window = windows.get_primary_mut().unwrap();
+    match interaction {
+        Interaction::Clicked => {
+            if gamestate.0 == GameState::HomePage {
+                new_game(commands, gamestate);
+                // todo start_game()
+            } else if gamestate.0 == GameState::Pause {
+                resume_game(commands, gamestate);
+            }
+        }
+        Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
+        _ => {}
+    }
+}
+
+fn on_click_pause_btn(
+    gamestate: Res<CurrentState<GameState>>,
+    query: Query<(&Interaction, With<PauseButton>)>,
+    commands: Commands,
+    mut windows: ResMut<Windows>,
+) {
+    let (interaction, ()) = query.single();
+    let window = windows.get_primary_mut().unwrap();
+    match interaction {
+        Interaction::Clicked => {
+            if gamestate.0 == GameState::Playing {
+                pause_game(commands, gamestate);
+            } else if gamestate.0 == GameState::Pause {
+                resume_game(commands, gamestate);
+            }
+        }
+        Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
+        _ => {}
+    }
 }
