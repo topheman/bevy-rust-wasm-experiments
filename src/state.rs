@@ -20,6 +20,7 @@ impl Plugin for StatePlugin {
 }
 
 pub fn new_game(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+    println!("call new_game");
     if gamestate.0 == GameState::HomePage {
         commands.insert_resource(NextState(GameState::PrepareGame));
     } else {
@@ -31,6 +32,7 @@ pub fn new_game(mut commands: Commands, gamestate: Res<CurrentState<GameState>>)
 }
 
 pub fn start_game(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+    println!("call start_game");
     if gamestate.0 == GameState::PrepareGame {
         commands.insert_resource(NextState(GameState::Playing))
     } else {
@@ -39,6 +41,7 @@ pub fn start_game(mut commands: Commands, gamestate: Res<CurrentState<GameState>
 }
 
 pub fn pause_game(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+    println!("call pause_game");
     if gamestate.0 == GameState::Playing {
         commands.insert_resource(NextState(GameState::Pause))
     } else {
@@ -47,6 +50,7 @@ pub fn pause_game(mut commands: Commands, gamestate: Res<CurrentState<GameState>
 }
 
 pub fn resume_game(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+    println!("call resume_game");
     if gamestate.0 == GameState::Pause {
         commands.insert_resource(NextState(GameState::Playing))
     } else {
@@ -58,6 +62,7 @@ pub fn resume_game(mut commands: Commands, gamestate: Res<CurrentState<GameState
 }
 
 pub fn game_over(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+    println!("call game_over");
     if gamestate.0 == GameState::Playing {
         commands.insert_resource(NextState(GameState::GameOver))
     } else {
@@ -82,7 +87,7 @@ fn on_click_page(
     // if gamestate.0 == GameState::Playing && buttons.just_pressed(MouseButton::Left) {
     //     return pause_game(commands, gamestate);
     // }
-    // if gamestate.0 == GameState::Pause && buttons.just_pressed(MouseButton::Left) {
+    // if gamestate.0 == GameState::Pause && buttons.just_released(MouseButton::Left) {
     //     return resume_game(commands, gamestate);
     // }
 }

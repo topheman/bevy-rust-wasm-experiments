@@ -1,24 +1,26 @@
-use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
+use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*, render::view::window};
 use iyes_loopless::prelude::*;
 
 use crate::state::{new_game, pause_game, resume_game, start_game, GameState};
 
 pub struct UiPlugin;
-
+// todo no MainButton - only Pause/HomeButton, always present, always active - eventually MainButton, only for display
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_enter_system(GameState::HomePage, home_page)
-            .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
-            .add_exit_system(GameState::HomePage, despawn_with::<Title>)
-            .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
-            .add_enter_system(GameState::Playing, playing)
-            .add_enter_system(GameState::Pause, pause)
-            .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
-            .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
-            .add_system(on_click_main_btn.run_in_state(GameState::HomePage))
-            .add_system(on_click_main_btn.run_in_state(GameState::Pause))
-            .add_system(on_click_pause_btn.run_in_state(GameState::Playing))
-            .add_system(on_click_pause_btn.run_in_state(GameState::Pause));
+            .add_enter_system(GameState::HomePage, top_menu)
+            // .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
+            // .add_exit_system(GameState::HomePage, despawn_with::<Title>)
+            // .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
+            // .add_enter_system(GameState::Playing, playing)
+            // .add_enter_system(GameState::Pause, pause)
+            // .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
+            // .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
+            .add_system(on_click_main_btn)
+            .add_system(on_click_pause_btn);
+        // .add_system(on_click_main_btn.run_in_state(GameState::Pause))
+        // .add_system(on_click_pause_btn.run_in_state(GameState::Playing))
+        // .add_system(on_click_pause_btn.run_in_state(GameState::Pause));
     }
 }
 
@@ -137,10 +139,7 @@ fn make_button<'a, 'b>(
     return commands;
 }
 
-fn playing_buttons<'a, 'b>(
-    mut commands: Commands<'a, 'b>,
-    ass: &Res<AssetServer>,
-) -> Commands<'a, 'b> {
+fn top_menu(mut commands: Commands, ass: Res<AssetServer>) {
     let butt_style = Style {
         justify_content: JustifyContent::Center,
         align_items: AlignItems::Center,
@@ -214,8 +213,6 @@ fn playing_buttons<'a, 'b>(
     commands
         .entity(top_menu)
         .push_children(&[pause_button, home_button]);
-
-    return commands;
 }
 
 fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
@@ -258,7 +255,6 @@ fn playing(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<Ass
     println!("playing");
     let mut camera = query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.0, 0.5, 0.0));
-    playing_buttons(commands, &ass);
 }
 
 fn pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
@@ -272,17 +268,20 @@ fn pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<Asset
 fn on_click_main_btn(
     gamestate: Res<CurrentState<GameState>>,
     query: Query<(&Interaction, With<MainButton>)>,
-    commands: Commands,
+    mut commands: Commands,
     mut windows: ResMut<Windows>,
 ) {
-    println!("on_click_main_btn");
     let (interaction, ()) = query.single();
     let window = windows.get_primary_mut().unwrap();
     match interaction {
         Interaction::Clicked => {
             if gamestate.0 == GameState::HomePage {
-                new_game(commands, gamestate);
-                // todo start_game()
+                // new_game(commands, gamestate);
+                commands.insert_resource(NextState(GameState::PrepareGame));
+                // start_game(commands, gamestate);
+                // commands.insert_resource(NextState(GameState::Playing))
+            } else if gamestate.0 == GameState::PrepareGame {
+                commands.insert_resource(NextState(GameState::Playing))
             } else if gamestate.0 == GameState::Pause {
                 resume_game(commands, gamestate);
             }
