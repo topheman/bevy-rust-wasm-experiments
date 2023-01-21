@@ -24,12 +24,10 @@ use state::StatePlugin;
 use texture::TexturePlugin;
 use ui::UiPlugin;
 
-pub const CLEAR_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
-
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle {
         camera_2d: Camera2d {
-            clear_color: ClearColorConfig::Custom(Color::rgb(1.0, 0.0, 0.0)),
+            clear_color: ClearColorConfig::Custom(Color::rgba_u8(144, 0, 0, 1)),
         },
         ..default()
     });
@@ -37,7 +35,7 @@ fn setup(mut commands: Commands) {
 
 fn main() {
     let mut app = App::new();
-    app.insert_resource(ClearColor(CLEAR_COLOR))
+    app.insert_resource(ClearColor(Color::rgba_u8(144, 0, 0, 1)))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 width: 600.0,

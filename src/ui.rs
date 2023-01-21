@@ -12,7 +12,7 @@
  *
  * This is a big problem (for example when you a have a button that handle both pause and resume and other things ...)
  */
-use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
+use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
 use crate::state::{new_game, pause_game, resume_game, start_game, GameState};
@@ -27,7 +27,7 @@ impl Plugin for UiPlugin {
             .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
             .add_exit_system(GameState::HomePage, despawn_with::<Title>)
             .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
-            .add_enter_system(GameState::Playing, playing)
+            // .add_enter_system(GameState::Playing, playing)
             .add_enter_system(GameState::Pause, home_and_pause)
             .add_enter_system(GameState::Pause, pause)
             .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
@@ -209,11 +209,9 @@ fn make_button<'a, 'b>(
     return commands;
 }
 
-fn home_and_pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
+fn home_and_pause(mut commands: Commands, ass: Res<AssetServer>) {
     println!("home_page");
-    let mut camera = query.single_mut();
-    camera.clear_color = ClearColorConfig::Custom(Color::rgb(1.0, 0.0, 0.0));
-
+    // todo always keep the project name in background ?
     // title
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
@@ -243,23 +241,17 @@ fn home_and_pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: 
     instuctions(commands, &ass);
 }
 
-fn playing(mut query: Query<&mut Camera2d>) {
-    println!("playing");
-    let mut camera = query.single_mut();
-    camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.0, 0.5, 0.0));
-}
+// fn playing() {
+//     println!("playing");
+// }
 
-fn pause(mut query: Query<&mut Camera2d>, commands: Commands, ass: Res<AssetServer>) {
+fn pause(commands: Commands, ass: Res<AssetServer>) {
     println!("pause");
-    let mut camera = query.single_mut();
-    camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.5, 0.0, 0.5));
     make_button("Pause", commands, &ass);
 }
 
-fn home(mut query: Query<&mut Camera2d>, commands: Commands, ass: Res<AssetServer>) {
+fn home(commands: Commands, ass: Res<AssetServer>) {
     println!("home");
-    let mut camera = query.single_mut();
-    camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.5, 0.0, 0.5));
     make_button("Start", commands, &ass);
 }
 
@@ -286,12 +278,16 @@ fn mouse_position_collides_main_button(
 ) -> bool {
     let (top, right, bottom, left) =
         get_main_btn_collide_coordinates(width, height, window_width, window_height);
-    if (x > left && x < right && y < top && y > bottom) {
+    if x > left && x < right && y < top && y > bottom {
         return true;
     }
     return false;
 }
 
+/**
+ * Like said at the top it's done this way, because we don't have `Interaction::Released` yet
+ * https://github.com/bevyengine/bevy/issues/5769
+ */
 fn handle_clicks(
     gamestate: Res<CurrentState<GameState>>,
     commands: Commands,
@@ -349,7 +345,6 @@ fn handle_main_btn_hover(
     mut windows: ResMut<Windows>,
 ) {
     let window = windows.get_primary_mut().unwrap();
-    // let (interaction, ()) = query.single();
     if let Ok((interaction, ())) = query.get_single() {
         match interaction {
             Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
