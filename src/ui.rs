@@ -18,23 +18,22 @@ use iyes_loopless::prelude::*;
 use crate::state::{new_game, pause_game, resume_game, start_game, GameState};
 
 pub struct UiPlugin;
-// todo no MainButton - only Pause/HomeButton, always present, always active - eventually MainButton, only for display
+
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_enter_system(GameState::HomePage, home_page)
-            .add_enter_system(GameState::HomePage, top_menu)
+        app.add_enter_system(GameState::HomePage, top_menu)
+            .add_enter_system(GameState::HomePage, home_and_pause)
+            .add_enter_system(GameState::HomePage, home)
             .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
             .add_exit_system(GameState::HomePage, despawn_with::<Title>)
             .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
             .add_enter_system(GameState::Playing, playing)
+            .add_enter_system(GameState::Pause, home_and_pause)
             .add_enter_system(GameState::Pause, pause)
-            .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
             .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
-            // .add_system(on_click_main_btn)
+            .add_exit_system(GameState::Pause, despawn_with::<Title>)
+            .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
             .add_system(on_click_pause_btn);
-        // .add_system(on_click_main_btn.run_in_state(GameState::Pause))
-        // .add_system(on_click_pause_btn.run_in_state(GameState::Playing))
-        // .add_system(on_click_pause_btn.run_in_state(GameState::Pause));
     }
 }
 
@@ -56,14 +55,69 @@ struct TopMenu;
 #[derive(Component)]
 pub struct PauseButton;
 
-#[derive(Component)]
-pub struct HomeButton;
-
 /// Despawn all entities with a given component type
 fn despawn_with<T: Component>(mut commands: Commands, q: Query<Entity, With<T>>) {
     for e in q.iter() {
         commands.entity(e).despawn_recursive();
     }
+}
+
+fn top_menu(mut commands: Commands, ass: Res<AssetServer>) {
+    let butt_style = Style {
+        justify_content: JustifyContent::Center,
+        align_items: AlignItems::Center,
+        padding: UiRect::all(Val::Px(8.0)),
+        margin: UiRect::all(Val::Px(4.0)),
+        flex_grow: 1.0,
+        ..Default::default()
+    };
+    let butt_textstyle = TextStyle {
+        font: ass.load("ThaleahFat.ttf"),
+        font_size: 24.0,
+        color: Color::BLACK,
+    };
+
+    let top_menu = commands
+        .spawn((
+            NodeBundle {
+                background_color: BackgroundColor(Color::rgb(0.5, 0.5, 0.5)),
+                style: Style {
+                    size: Size::new(Val::Auto, Val::Auto),
+                    margin: UiRect::all(Val::Auto),
+                    align_self: AlignSelf::Center,
+                    flex_direction: FlexDirection::Row,
+                    justify_content: JustifyContent::Center,
+                    position_type: PositionType::Absolute,
+                    position: UiRect {
+                        top: Val::Px(15.0),
+                        left: Val::Px(15.0),
+                        ..default()
+                    },
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            TopMenu,
+        ))
+        .id();
+
+    let pause_button = commands
+        .spawn((
+            ButtonBundle {
+                style: butt_style.clone(),
+                ..Default::default()
+            },
+            PauseButton,
+        ))
+        .with_children(|btn| {
+            btn.spawn(TextBundle {
+                text: Text::from_section("P", butt_textstyle.clone()),
+                ..Default::default()
+            });
+        })
+        .id();
+
+    commands.entity(top_menu).push_children(&[pause_button]);
 }
 
 fn instuctions<'a, 'b>(mut commands: Commands<'a, 'b>, ass: &Res<AssetServer>) -> Commands<'a, 'b> {
@@ -72,7 +126,7 @@ fn instuctions<'a, 'b>(mut commands: Commands<'a, 'b>, ass: &Res<AssetServer>) -
         // Create a TextBundle that has a Text with a single section.
         TextBundle::from_section(
             // Accepts a `String` or any type that converts into a `String`, such as `&str`
-            "H: back to home page\nP: pause\nSPACE/TAP: slow down the ball\nARROW keys: move the ball\n\nOn mobile, tilt your device",
+            "P: pause\nSPACE/TAP: slow down the ball\nARROW keys: move the ball\n\nOn mobile, tilt your device",
             TextStyle {
                 font: ass.load("m6x11.ttf"),
                 font_size: 24.0,
@@ -153,83 +207,7 @@ fn make_button<'a, 'b>(
     return commands;
 }
 
-fn top_menu(mut commands: Commands, ass: Res<AssetServer>) {
-    let butt_style = Style {
-        justify_content: JustifyContent::Center,
-        align_items: AlignItems::Center,
-        padding: UiRect::all(Val::Px(8.0)),
-        margin: UiRect::all(Val::Px(4.0)),
-        flex_grow: 1.0,
-        ..Default::default()
-    };
-    let butt_textstyle = TextStyle {
-        font: ass.load("ThaleahFat.ttf"),
-        font_size: 24.0,
-        color: Color::BLACK,
-    };
-
-    let top_menu = commands
-        .spawn((
-            NodeBundle {
-                background_color: BackgroundColor(Color::rgb(0.5, 0.5, 0.5)),
-                style: Style {
-                    size: Size::new(Val::Auto, Val::Auto),
-                    margin: UiRect::all(Val::Auto),
-                    align_self: AlignSelf::Center,
-                    flex_direction: FlexDirection::Row,
-                    justify_content: JustifyContent::Center,
-                    position_type: PositionType::Absolute,
-                    position: UiRect {
-                        top: Val::Px(15.0),
-                        left: Val::Px(15.0),
-                        ..default()
-                    },
-                    ..Default::default()
-                },
-                ..Default::default()
-            },
-            TopMenu,
-        ))
-        .id();
-
-    let home_button = commands
-        .spawn((
-            ButtonBundle {
-                style: butt_style.clone(),
-                ..Default::default()
-            },
-            HomeButton,
-        ))
-        .with_children(|btn| {
-            btn.spawn(TextBundle {
-                text: Text::from_section("H", butt_textstyle.clone()),
-                ..Default::default()
-            });
-        })
-        .id();
-
-    let pause_button = commands
-        .spawn((
-            ButtonBundle {
-                style: butt_style.clone(),
-                ..Default::default()
-            },
-            PauseButton,
-        ))
-        .with_children(|btn| {
-            btn.spawn(TextBundle {
-                text: Text::from_section("P", butt_textstyle.clone()),
-                ..Default::default()
-            });
-        })
-        .id();
-
-    commands
-        .entity(top_menu)
-        .push_children(&[pause_button, home_button]);
-}
-
-fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
+fn home_and_pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
     println!("home_page");
     let mut camera = query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(1.0, 0.0, 0.0));
@@ -260,49 +238,27 @@ fn home_page(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<A
         Title,
     ));
 
-    let mut commands2 = instuctions(commands, &ass);
-
-    make_button("Start Game", commands2, &ass);
+    instuctions(commands, &ass);
 }
 
-fn playing(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
+fn playing(mut query: Query<&mut Camera2d>) {
     println!("playing");
     let mut camera = query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.0, 0.5, 0.0));
 }
 
-fn pause(mut query: Query<&mut Camera2d>, mut commands: Commands, ass: Res<AssetServer>) {
+fn pause(mut query: Query<&mut Camera2d>, commands: Commands, ass: Res<AssetServer>) {
     println!("pause");
     let mut camera = query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.5, 0.0, 0.5));
-    let mut commands2 = make_button("Pause", commands, &ass);
-    instuctions(commands2, &ass);
+    make_button("Pause", commands, &ass);
 }
 
-fn on_click_main_btn(
-    gamestate: Res<CurrentState<GameState>>,
-    query: Query<(&Interaction, With<MainButton>)>,
-    mut commands: Commands,
-    mut windows: ResMut<Windows>,
-) {
-    let (interaction, ()) = query.single();
-    let window = windows.get_primary_mut().unwrap();
-    match interaction {
-        Interaction::Clicked => {
-            if gamestate.0 == GameState::HomePage {
-                // new_game(commands, gamestate);
-                commands.insert_resource(NextState(GameState::PrepareGame));
-                // start_game(commands, gamestate);
-                // commands.insert_resource(NextState(GameState::Playing))
-            } else if gamestate.0 == GameState::PrepareGame {
-                commands.insert_resource(NextState(GameState::Playing))
-            } else if gamestate.0 == GameState::Pause {
-                resume_game(commands, gamestate);
-            }
-        }
-        Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
-        _ => {}
-    }
+fn home(mut query: Query<&mut Camera2d>, commands: Commands, ass: Res<AssetServer>) {
+    println!("home");
+    let mut camera = query.single_mut();
+    camera.clear_color = ClearColorConfig::Custom(Color::rgb(0.5, 0.0, 0.5));
+    make_button("Start", commands, &ass);
 }
 
 fn get_main_btn_collide_coordinates(
