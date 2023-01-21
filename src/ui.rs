@@ -21,17 +21,18 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_enter_system(GameState::HomePage, top_menu)
+        app.add_enter_system(GameState::HomePage, title)
+            .add_enter_system(GameState::HomePage, top_menu)
             .add_enter_system(GameState::HomePage, home_and_pause)
             .add_enter_system(GameState::HomePage, home)
             .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
-            .add_exit_system(GameState::HomePage, despawn_with::<Title>)
+            // .add_exit_system(GameState::HomePage, despawn_with::<Title>)
             .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
             // .add_enter_system(GameState::Playing, playing)
             .add_enter_system(GameState::Pause, home_and_pause)
             .add_enter_system(GameState::Pause, pause)
             .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
-            .add_exit_system(GameState::Pause, despawn_with::<Title>)
+            // .add_exit_system(GameState::Pause, despawn_with::<Title>)
             .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
             .add_system(handle_clicks)
             .add_system(handle_pause_btn_hover)
@@ -209,10 +210,7 @@ fn make_button<'a, 'b>(
     return commands;
 }
 
-fn home_and_pause(mut commands: Commands, ass: Res<AssetServer>) {
-    println!("home_page");
-    // todo always keep the project name in background ?
-    // title
+fn title(mut commands: Commands, ass: Res<AssetServer>) {
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
         TextBundle::from_section(
@@ -237,7 +235,10 @@ fn home_and_pause(mut commands: Commands, ass: Res<AssetServer>) {
         }),
         Title,
     ));
+}
 
+fn home_and_pause(mut commands: Commands, ass: Res<AssetServer>) {
+    println!("home_page");
     instuctions(commands, &ass);
 }
 
