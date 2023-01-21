@@ -7,15 +7,15 @@ pub enum GameState {
     PrepareGame,
     Playing,
     Pause,
-    GameOver,
+    // GameOver,
 }
 
 pub struct StatePlugin;
 
 impl Plugin for StatePlugin {
     fn build(&self, app: &mut App) {
-        app.add_loopless_state(GameState::HomePage)
-            .add_system(on_click_page);
+        app.add_loopless_state(GameState::HomePage);
+        // .add_system(on_click_page);
     }
 }
 
@@ -61,33 +61,33 @@ pub fn resume_game(mut commands: Commands, gamestate: Res<CurrentState<GameState
     }
 }
 
-pub fn game_over(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
-    println!("call game_over");
-    if gamestate.0 == GameState::Playing {
-        commands.insert_resource(NextState(GameState::GameOver))
-    } else {
-        println!(
-            "Impossible state, you can only run game_over in GameState::Playing state, ran from {:?}",
-            gamestate.0
-        );
-    }
-}
+// pub fn game_over(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+//     println!("call game_over");
+//     if gamestate.0 == GameState::Playing {
+//         commands.insert_resource(NextState(GameState::GameOver))
+//     } else {
+//         println!(
+//             "Impossible state, you can only run game_over in GameState::Playing state, ran from {:?}",
+//             gamestate.0
+//         );
+//     }
+// }
 
-fn on_click_page(
-    gamestate: Res<CurrentState<GameState>>,
-    buttons: Res<Input<MouseButton>>,
-    commands: Commands,
-) {
-    // if gamestate.0 == GameState::HomePage && buttons.just_pressed(MouseButton::Left) {
-    //     return new_game(commands, gamestate);
-    // }
-    // if gamestate.0 == GameState::PrepareGame && buttons.just_pressed(MouseButton::Left) {
-    //     return start_game(commands, gamestate);
-    // }
-    // if gamestate.0 == GameState::Playing && buttons.just_pressed(MouseButton::Left) {
-    //     return pause_game(commands, gamestate);
-    // }
-    // if gamestate.0 == GameState::Pause && buttons.just_released(MouseButton::Left) {
-    //     return resume_game(commands, gamestate);
-    // }
-}
+// fn on_click_page(
+//     gamestate: Res<CurrentState<GameState>>,
+//     buttons: Res<Input<MouseButton>>,
+//     commands: Commands,
+// ) {
+//     if gamestate.0 == GameState::HomePage && buttons.just_pressed(MouseButton::Left) {
+//         return new_game(commands, gamestate);
+//     }
+//     if gamestate.0 == GameState::PrepareGame && buttons.just_pressed(MouseButton::Left) {
+//         return start_game(commands, gamestate);
+//     }
+//     if gamestate.0 == GameState::Playing && buttons.just_pressed(MouseButton::Left) {
+//         return pause_game(commands, gamestate);
+//     }
+//     if gamestate.0 == GameState::Pause && buttons.just_released(MouseButton::Left) {
+//         return resume_game(commands, gamestate);
+//     }
+// }
