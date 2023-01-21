@@ -34,7 +34,8 @@ impl Plugin for UiPlugin {
             .add_exit_system(GameState::Pause, despawn_with::<Title>)
             .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
             .add_system(handle_clicks)
-            .add_system(handle_pause_btn_hover);
+            .add_system(handle_pause_btn_hover)
+            .add_system(handle_main_btn_hover);
     }
 }
 
@@ -340,5 +341,19 @@ fn handle_pause_btn_hover(
     match interaction {
         Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
         _ => {}
+    }
+}
+
+fn handle_main_btn_hover(
+    query: Query<(&Interaction, With<MainButton>)>,
+    mut windows: ResMut<Windows>,
+) {
+    let window = windows.get_primary_mut().unwrap();
+    // let (interaction, ()) = query.single();
+    if let Ok((interaction, ())) = query.get_single() {
+        match interaction {
+            Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
+            _ => {}
+        }
     }
 }
