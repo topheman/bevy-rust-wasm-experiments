@@ -238,7 +238,7 @@ fn title(mut commands: Commands, ass: Res<AssetServer>) {
     ));
 }
 
-fn home_and_pause(mut commands: Commands, ass: Res<AssetServer>) {
+fn home_and_pause(commands: Commands, ass: Res<AssetServer>) {
     println!("home_page");
     instuctions(commands, &ass);
 }
