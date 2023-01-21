@@ -33,7 +33,8 @@ impl Plugin for UiPlugin {
             .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
             .add_exit_system(GameState::Pause, despawn_with::<Title>)
             .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
-            .add_system(on_click_pause_btn);
+            .add_system(handle_clicks)
+            .add_system(handle_pause_btn_hover);
     }
 }
 
@@ -290,14 +291,12 @@ fn mouse_position_collides_main_button(
     return false;
 }
 
-fn on_click_pause_btn(
+fn handle_clicks(
     gamestate: Res<CurrentState<GameState>>,
-    query: Query<(&Interaction, With<PauseButton>)>,
     commands: Commands,
     buttons: Res<Input<MouseButton>>,
     mut windows: ResMut<Windows>,
 ) {
-    let (interaction, ()) = query.single();
     let window = windows.get_primary_mut().unwrap();
     if buttons.just_released(MouseButton::Left) {
         println!("released");
@@ -330,14 +329,15 @@ fn on_click_pause_btn(
             }
         }
     }
+}
+
+fn handle_pause_btn_hover(
+    query: Query<(&Interaction, With<PauseButton>)>,
+    mut windows: ResMut<Windows>,
+) {
+    let window = windows.get_primary_mut().unwrap();
+    let (interaction, ()) = query.single();
     match interaction {
-        Interaction::Clicked => {
-            // if gamestate.0 == GameState::Playing {
-            //     pause_game(commands, gamestate);
-            // } else if gamestate.0 == GameState::Pause {
-            //     resume_game(commands, gamestate);
-            // }
-        }
         Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
         _ => {}
     }
