@@ -34,13 +34,14 @@ fn get_orientation_y() -> f32 {
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_enter_system(GameState::PrepareGame, spawn_player)
-            .add_system(handle_player_input_keyboard.run_in_state(GameState::Playing));
+            .add_system(handle_player_input.run_in_state(GameState::Playing));
     }
 }
 
-fn handle_player_input_keyboard(
+fn handle_player_input(
     mut player_query: Query<&mut Ball>,
     mut camera_query: Query<&mut Camera2d>,
+    mouse: Res<Input<MouseButton>>,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
@@ -59,7 +60,7 @@ fn handle_player_input_keyboard(
     if keyboard.pressed(KeyCode::Right) {
         ball.velocity_x += ball.speed_with_keyboard * time.delta_seconds();
     }
-    if keyboard.pressed(KeyCode::Space) {
+    if keyboard.pressed(KeyCode::Space) || mouse.pressed(MouseButton::Left) {
         ball.velocity_x = ball.velocity_x * 0.98;
         ball.velocity_y = ball.velocity_y * 0.98;
         camera.clear_color = ClearColorConfig::Custom(SLOW_DOWN_BACKGROUND_COLOR);

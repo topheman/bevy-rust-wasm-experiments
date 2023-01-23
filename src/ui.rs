@@ -7,9 +7,11 @@
  *
  * You can't beat HTML, jsx or templating languages for ui ...
  */
+use bevy::core_pipeline::clear_color::ClearColorConfig;
 use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
+use crate::colors::DEFAULT_COLOR;
 use crate::state::{new_game, pause_game, resume_game, start_game, GameState};
 
 pub struct UiPlugin;
@@ -243,8 +245,10 @@ fn home_and_pause(commands: Commands, ass: Res<AssetServer>) {
 //     println!("playing");
 // }
 
-fn pause(commands: Commands, ass: Res<AssetServer>) {
+fn pause(commands: Commands, ass: Res<AssetServer>, mut camera_query: Query<&mut Camera2d>) {
     println!("pause");
+    let mut camera = camera_query.single_mut();
+    camera.clear_color = ClearColorConfig::Custom(DEFAULT_COLOR);
     make_button("Pause", commands, &ass);
 }
 
