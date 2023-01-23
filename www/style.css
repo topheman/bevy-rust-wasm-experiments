@@ -12,6 +12,11 @@ body, html {
   }
 }
 
+body.playing {
+  user-select: none; /* prevent magnifying glass in ios */
+  -webkit-user-select: none;
+}
+
 canvas#bevy {
   display: none;
 }
