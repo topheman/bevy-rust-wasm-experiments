@@ -12,7 +12,7 @@ use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
 use crate::colors::DEFAULT_COLOR;
-use crate::state::{new_game, pause_game, resume_game, start_game, GameState};
+use crate::state::{new_game, pause_game, resume_game, GameState};
 
 pub struct UiPlugin;
 
@@ -274,8 +274,6 @@ fn handle_main_btn_click(
             Interaction::Clicked => {
                 if gamestate.0 == GameState::HomePage {
                     new_game(commands, gamestate);
-                } else if gamestate.0 == GameState::PrepareGame {
-                    start_game(commands, gamestate);
                 } else if gamestate.0 == GameState::Pause {
                     resume_game(commands, gamestate);
                 }
