@@ -15,6 +15,7 @@ body, html {
 body.playing {
   user-select: none; /* prevent magnifying glass in ios */
   -webkit-user-select: none;
+  overflow: hidden; /* prevent scroll */
 }
 
 canvas#bevy {
