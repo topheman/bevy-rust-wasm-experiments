@@ -8,6 +8,7 @@ use bevy::{
 
 mod audio;
 mod ball;
+mod colors;
 mod debug;
 mod player;
 mod resizable;
@@ -27,7 +28,7 @@ use ui::UiPlugin;
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle {
         camera_2d: Camera2d {
-            clear_color: ClearColorConfig::Custom(Color::rgb(0.5625, 0.0, 0.0)), // #900000 = rgb(144/256,0,0)
+            clear_color: ClearColorConfig::Custom(colors::DEFAULT_COLOR),
         },
         ..default()
     });

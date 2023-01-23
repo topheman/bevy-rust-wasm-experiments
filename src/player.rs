@@ -1,9 +1,11 @@
+use bevy::core_pipeline::clear_color::ClearColorConfig;
 use bevy::prelude::*;
 use iyes_loopless::prelude::{AppLooplessStateExt, CurrentState, IntoConditionalSystem};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::ball::Ball;
+use crate::colors::{DEFAULT_COLOR, SLOW_DOWN_BACKGROUND_COLOR};
 use crate::state::{start_game, GameState};
 use crate::texture::{spawn_assets_sprite, BallTexture};
 
@@ -38,10 +40,12 @@ impl Plugin for PlayerPlugin {
 
 fn handle_player_input_keyboard(
     mut player_query: Query<&mut Ball>,
+    mut camera_query: Query<&mut Camera2d>,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
     let mut ball = player_query.single_mut();
+    let mut camera = camera_query.single_mut();
 
     if keyboard.pressed(KeyCode::Up) {
         ball.velocity_y += ball.speed_with_keyboard * time.delta_seconds();
@@ -58,6 +62,10 @@ fn handle_player_input_keyboard(
     if keyboard.pressed(KeyCode::Space) {
         ball.velocity_x = ball.velocity_x * 0.98;
         ball.velocity_y = ball.velocity_y * 0.98;
+        camera.clear_color = ClearColorConfig::Custom(SLOW_DOWN_BACKGROUND_COLOR);
+    } else {
+        // todo check if we need to change the color?
+        camera.clear_color = ClearColorConfig::Custom(DEFAULT_COLOR);
     }
 
     // mobile with accelerometer
