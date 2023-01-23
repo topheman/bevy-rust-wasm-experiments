@@ -6,11 +6,6 @@
  * If you have a better way to do it, you are welcome to open a PR.
  *
  * You can't beat HTML, jsx or templating languages for ui ...
- *
- * Without talking about the interactions. If I did the collision testing myself,
- * it's because the `Interaction::Released` is not yet available: https://github.com/bevyengine/bevy/issues/5769
- *
- * This is a big problem (for example when you a have a button that handle both pause and resume and other things ...)
  */
 use bevy::prelude::*;
 use iyes_loopless::prelude::*;
@@ -35,7 +30,8 @@ impl Plugin for UiPlugin {
             .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
             .add_exit_system(GameState::Pause, despawn_with::<Title>)
             .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
-            .add_system(handle_clicks)
+            .add_system(handle_main_btn_click)
+            .add_system(handle_pause_btn_click)
             .add_system(handle_pause_btn_hover)
             .add_system(handle_main_btn_hover);
     }
@@ -257,75 +253,47 @@ fn home(commands: Commands, ass: Res<AssetServer>) {
     make_button("Start", commands, &ass);
 }
 
-fn get_main_btn_collide_coordinates(
-    width: f32,
-    height: f32,
-    window_width: f32,
-    window_height: f32,
-) -> (f32, f32, f32, f32) {
-    let left = (window_width - width) / 2.0;
-    let right = left + width;
-    let bottom = (window_height - height) / 2.0;
-    let top = bottom + height;
-    return (top, right, bottom, left);
-}
-
-fn mouse_position_collides_main_button(
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
-    window_width: f32,
-    window_height: f32,
-) -> bool {
-    let (top, right, bottom, left) =
-        get_main_btn_collide_coordinates(width, height, window_width, window_height);
-    if x > left && x < right && y < top && y > bottom {
-        return true;
-    }
-    return false;
-}
-
 /**
- * Like said at the top it's done this way, because we don't have `Interaction::Released` yet
- * https://github.com/bevyengine/bevy/issues/5769
+ * Following handlers for click/tap.
+ *
+ * For the moment, `Interaction::Released` is not yet available: https://github.com/bevyengine/bevy/issues/5769
+ * so I didn't out the resume_game on the pause button
  */
-fn handle_clicks(
+
+fn handle_main_btn_click(
+    query: Query<(&Interaction, With<MainButton>)>,
     gamestate: Res<CurrentState<GameState>>,
     commands: Commands,
-    buttons: Res<Input<MouseButton>>,
-    mut windows: ResMut<Windows>,
 ) {
-    let window = windows.get_primary_mut().unwrap();
-    if buttons.just_released(MouseButton::Left) {
-        println!("released");
-        if gamestate.0 == GameState::HomePage {
-            new_game(commands, gamestate);
-        } else if gamestate.0 == GameState::PrepareGame {
-            start_game(commands, gamestate);
-        } else if let Some(position) = window.cursor_position() {
-            println!("position {} {}", position, window.height());
-            if (position.x > 20.0 && position.x < 48.0 && position.y < (window.height() - 20.0))
-                && position.y > (window.height() - 60.0)
-            {
-                println!("released Pause");
-                if gamestate.0 == GameState::Playing {
-                    pause_game(commands, gamestate);
+    if let Ok((interaction, ())) = query.get_single() {
+        match interaction {
+            Interaction::Clicked => {
+                if gamestate.0 == GameState::HomePage {
+                    new_game(commands, gamestate);
+                } else if gamestate.0 == GameState::PrepareGame {
+                    start_game(commands, gamestate);
                 } else if gamestate.0 == GameState::Pause {
                     resume_game(commands, gamestate);
                 }
-            } else if gamestate.0 == GameState::Pause
-                && mouse_position_collides_main_button(
-                    position.x,
-                    position.y,
-                    82.0,
-                    40.0,
-                    window.width(),
-                    window.height(),
-                )
-            {
-                resume_game(commands, gamestate);
             }
+            _ => {}
+        }
+    }
+}
+
+fn handle_pause_btn_click(
+    query: Query<(&Interaction, With<PauseButton>)>,
+    gamestate: Res<CurrentState<GameState>>,
+    commands: Commands,
+) {
+    if let Ok((interaction, ())) = query.get_single() {
+        match interaction {
+            Interaction::Clicked => {
+                if gamestate.0 == GameState::Playing {
+                    pause_game(commands, gamestate);
+                }
+            }
+            _ => {}
         }
     }
 }
