@@ -10,6 +10,7 @@ mod audio;
 mod ball;
 mod colors;
 mod debug;
+mod ennemies;
 mod player;
 mod resizable;
 mod state;
@@ -19,6 +20,7 @@ mod ui;
 use audio::AudioPlugin;
 use ball::{BallPlugin, CollisionEvent};
 use debug::DebugPlugin;
+use ennemies::EnnemiesPlugin;
 use player::PlayerPlugin;
 use resizable::ResizablePlugin;
 use state::StatePlugin;
@@ -57,6 +59,7 @@ fn main() {
         .add_plugin(DebugPlugin)
         .add_plugin(TexturePlugin)
         .add_plugin(PlayerPlugin)
+        .add_plugin(EnnemiesPlugin)
         .add_plugin(BallPlugin)
         .add_event::<CollisionEvent>()
         .add_plugin(UiPlugin)

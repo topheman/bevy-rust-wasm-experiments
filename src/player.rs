@@ -38,8 +38,11 @@ impl Plugin for PlayerPlugin {
     }
 }
 
+#[derive(Component)]
+struct Player;
+
 fn handle_player_input(
-    mut player_query: Query<&mut Ball>,
+    mut player_query: Query<&mut Ball, With<Player>>,
     mut camera_query: Query<&mut Camera2d>,
     mouse: Res<Input<MouseButton>>,
     keyboard: Res<Input<KeyCode>>,
@@ -84,7 +87,10 @@ fn spawn_player(
     ball_texture: Res<BallTexture>,
     gamestate: Res<CurrentState<GameState>>,
 ) {
-    let player_ball_component = Ball::new(30.0, 40.0, BALL_DEFAULT_RADIUS * PLAYER_SCALE);
+    let player_ball_component = (
+        Ball::new(30.0, 40.0, BALL_DEFAULT_RADIUS * PLAYER_SCALE),
+        Player,
+    );
     let player_entity = spawn_assets_sprite(
         &mut commands,
         &ball_texture,
