@@ -7,6 +7,7 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
 use iyes_loopless::prelude::IntoConditionalSystem;
+use rand::Rng;
 
 use crate::resizable::Viewport;
 use crate::state::GameState;
@@ -102,4 +103,53 @@ fn handle_ball_wall_collisions(
             collision_events.send(CollisionEvent::BallWall);
         }
     }
+}
+
+/**
+ * todo prefer providing coordinates to a safe square?
+ */
+fn get_safe_random_position(window_size: f32, safe_zone: f32) -> f32 {
+    let mut rng = rand::thread_rng();
+    let random_position_from_center: f32 =
+        rng.gen_range(((-window_size + safe_zone) / 2.0)..((window_size - safe_zone) / 2.0));
+    let safe_random_position_from_center = if random_position_from_center > 0.0 {
+        random_position_from_center + safe_zone / 2.0
+    } else {
+        random_position_from_center - safe_zone / 2.0
+    };
+    return safe_random_position_from_center;
+}
+
+/**
+ * Return a tuple of velocity that will go away from the player's ball
+ */
+fn get_random_velocity(position: f32, max_velocity: f32) -> f32 {
+    let mut rng = rand::thread_rng();
+    let mut velocity: f32 = if position > 0.0 {
+        max_velocity
+    } else {
+        -max_velocity
+    };
+    velocity *= rng.gen::<f32>();
+    return velocity;
+}
+
+pub fn get_random_position_and_speed(
+    window_width: f32,
+    window_height: f32,
+    safe_zone: f32,
+    max_velocity: f32,
+) -> (Vec3, f32, f32) {
+    let x: f32 = get_safe_random_position(window_width, safe_zone);
+    let y: f32 = get_safe_random_position(window_height, safe_zone);
+    println!("random {:?} {:?}", x, y);
+    println!(
+        "random2 {:?}",
+        get_safe_random_position(window_height, safe_zone)
+    );
+    let velocity_x = get_random_velocity(x, max_velocity);
+    let velocity_y = get_random_velocity(y, max_velocity);
+    let translation = Vec3::new(x / 2.0, y / 2.0, 900.0);
+    println!("velocity {:?} {:?}", velocity_x, velocity_y);
+    return (translation, velocity_x, velocity_y);
 }

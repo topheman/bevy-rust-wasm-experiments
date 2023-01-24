@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::ball::Ball;
+use crate::ball::{get_random_position_and_speed, Ball};
 use crate::state::GameState;
 use crate::texture::{spawn_assets_sprite, BallTexture};
 use iyes_loopless::prelude::AppLooplessStateExt;
@@ -22,21 +22,24 @@ pub struct Ennemy {
 }
 
 impl Ennemy {
-    fn bounceWall(&mut self) {
+    fn bounce_wall(&mut self) {
         self.life -= 2.0;
     }
-    fn bouncePlayer(&mut self) {
+    fn bounce_player(&mut self) {
         self.life -= 4.0;
     }
-    fn isDying(&self) -> bool {
+    fn is_dying(&self) -> bool {
         return self.life < 6.0;
     }
 }
 
-fn spawn_ennemy(mut commands: Commands, ball_texture: Res<BallTexture>) {
+fn spawn_ennemy(mut commands: Commands, ball_texture: Res<BallTexture>, windows: Res<Windows>) {
     println!("spawn_ennemy");
+    let window = windows.get_primary().unwrap();
+    let (random_position, velocity_x, velocity_y) =
+        get_random_position_and_speed(window.width(), window.height(), 350.0, 100.0);
     let ennemy_ball_component = (
-        Ball::new(-60.0, 80.0, BALL_DEFAULT_RADIUS * ENNEMY_SCALE),
+        Ball::new(velocity_x, velocity_y, BALL_DEFAULT_RADIUS * ENNEMY_SCALE),
         Ennemy { life: 20.0 },
     );
     let player_entity = spawn_assets_sprite(
@@ -44,7 +47,7 @@ fn spawn_ennemy(mut commands: Commands, ball_texture: Res<BallTexture>) {
         &ball_texture,
         1,
         Color::rgb(0.4, 0.5, 0.5),
-        Vec3::new(-100.0, 0.0, 900.0),
+        random_position,
         Vec3::splat(ENNEMY_SCALE),
     );
 
