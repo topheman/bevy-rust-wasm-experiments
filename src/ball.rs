@@ -18,7 +18,7 @@ pub struct BallPlugin;
 pub struct Ball {
     pub velocity_x: f32,
     pub velocity_y: f32,
-    radius: f32,
+    pub radius: f32,
     mass: f32,
     gravity: f32,
     elasticity: f32,
@@ -105,24 +105,38 @@ fn handle_ball_wall_collisions(
     }
 }
 
-/**
- * todo prefer providing coordinates to a safe square?
- */
-fn get_safe_random_position(window_size: f32, safe_zone: f32) -> f32 {
+fn get_safe_random_position(
+    window_size: f32,
+    safe_zone_min: f32,
+    safe_zone_max: f32,
+) -> (f32, bool) {
     let mut rng = rand::thread_rng();
     let random_position_from_center: f32 =
-        rng.gen_range(((-window_size + safe_zone) / 2.0)..((window_size - safe_zone) / 2.0));
-    let safe_random_position_from_center = if random_position_from_center > 0.0 {
-        random_position_from_center + safe_zone / 2.0
+        rng.gen_range(((-window_size) / 2.0)..((window_size) / 2.0));
+    if random_position_from_center > safe_zone_min && random_position_from_center < safe_zone_max {
+        return (random_position_from_center, false);
     } else {
-        random_position_from_center - safe_zone / 2.0
+        return (random_position_from_center, true);
     };
-    return safe_random_position_from_center;
 }
 
-/**
- * Return a tuple of velocity that will go away from the player's ball
- */
+fn get_safe_random_positions(
+    window_width: f32,
+    window_height: f32,
+    safe_zone_min: f32,
+    safe_zone_max: f32,
+) -> (f32, f32) {
+    let result = loop {
+        println!("get_safe_random_positions");
+        let (x, unsafe_x) = get_safe_random_position(window_width, safe_zone_min, safe_zone_max);
+        let (y, unsafe_y) = get_safe_random_position(window_height, safe_zone_min, safe_zone_max);
+        if unsafe_x || unsafe_y || (!unsafe_x && !unsafe_y) {
+            break (x, y);
+        }
+    };
+    return result;
+}
+
 fn get_random_velocity(position: f32, max_velocity: f32) -> f32 {
     let mut rng = rand::thread_rng();
     let mut velocity: f32 = if position > 0.0 {
@@ -137,16 +151,12 @@ fn get_random_velocity(position: f32, max_velocity: f32) -> f32 {
 pub fn get_random_position_and_speed(
     window_width: f32,
     window_height: f32,
-    safe_zone: f32,
+    safe_zone_min: f32,
+    safe_zone_max: f32,
     max_velocity: f32,
 ) -> (Vec3, f32, f32) {
-    let x: f32 = get_safe_random_position(window_width, safe_zone);
-    let y: f32 = get_safe_random_position(window_height, safe_zone);
-    println!("random {:?} {:?}", x, y);
-    println!(
-        "random2 {:?}",
-        get_safe_random_position(window_height, safe_zone)
-    );
+    let (x, y) =
+        get_safe_random_positions(window_width, window_height, safe_zone_min, safe_zone_max);
     let velocity_x = get_random_velocity(x, max_velocity);
     let velocity_y = get_random_velocity(y, max_velocity);
     let translation = Vec3::new(x / 2.0, y / 2.0, 900.0);

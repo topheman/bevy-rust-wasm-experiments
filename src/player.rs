@@ -39,7 +39,7 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Component)]
-struct Player;
+pub struct Player;
 
 fn handle_player_input(
     mut player_query: Query<&mut Ball, With<Player>>,
