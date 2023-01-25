@@ -49,9 +49,13 @@ fn spawn_ennemy(
     let (random_position, velocity_x, velocity_y) = get_random_position_and_speed(
         window.width(),
         window.height(),
-        player_x - player_radius, // todo safe_zone_{min,max}_{x,y}
+        player_x - player_radius,
         player_x + player_radius,
-        100.0,
+        player_y - player_radius,
+        player_y + player_radius,
+        player_x,
+        player_y,
+        200.0,
     );
     let ennemy_ball_component = (
         Ball::new(velocity_x, velocity_y, BALL_DEFAULT_RADIUS * ENNEMY_SCALE),

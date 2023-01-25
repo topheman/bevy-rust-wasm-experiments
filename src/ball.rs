@@ -123,13 +123,17 @@ fn get_safe_random_position(
 fn get_safe_random_positions(
     window_width: f32,
     window_height: f32,
-    safe_zone_min: f32,
-    safe_zone_max: f32,
+    safe_zone_min_x: f32,
+    safe_zone_max_x: f32,
+    safe_zone_min_y: f32,
+    safe_zone_max_y: f32,
 ) -> (f32, f32) {
     let result = loop {
         println!("get_safe_random_positions");
-        let (x, unsafe_x) = get_safe_random_position(window_width, safe_zone_min, safe_zone_max);
-        let (y, unsafe_y) = get_safe_random_position(window_height, safe_zone_min, safe_zone_max);
+        let (x, unsafe_x) =
+            get_safe_random_position(window_width, safe_zone_min_x, safe_zone_max_x);
+        let (y, unsafe_y) =
+            get_safe_random_position(window_height, safe_zone_min_y, safe_zone_max_y);
         if unsafe_x || unsafe_y || (!unsafe_x && !unsafe_y) {
             break (x, y);
         }
@@ -137,9 +141,9 @@ fn get_safe_random_positions(
     return result;
 }
 
-fn get_random_velocity(position: f32, max_velocity: f32) -> f32 {
+fn get_random_velocity(position: f32, player_position: f32, max_velocity: f32) -> f32 {
     let mut rng = rand::thread_rng();
-    let mut velocity: f32 = if position > 0.0 {
+    let mut velocity: f32 = if position > player_position {
         max_velocity
     } else {
         -max_velocity
@@ -151,14 +155,24 @@ fn get_random_velocity(position: f32, max_velocity: f32) -> f32 {
 pub fn get_random_position_and_speed(
     window_width: f32,
     window_height: f32,
-    safe_zone_min: f32,
-    safe_zone_max: f32,
+    safe_zone_min_x: f32,
+    safe_zone_max_x: f32,
+    safe_zone_min_y: f32,
+    safe_zone_max_y: f32,
+    player_x: f32,
+    player_y: f32,
     max_velocity: f32,
 ) -> (Vec3, f32, f32) {
-    let (x, y) =
-        get_safe_random_positions(window_width, window_height, safe_zone_min, safe_zone_max);
-    let velocity_x = get_random_velocity(x, max_velocity);
-    let velocity_y = get_random_velocity(y, max_velocity);
+    let (x, y) = get_safe_random_positions(
+        window_width,
+        window_height,
+        safe_zone_min_x,
+        safe_zone_max_x,
+        safe_zone_min_y,
+        safe_zone_max_y,
+    );
+    let velocity_x = get_random_velocity(x, player_x, max_velocity);
+    let velocity_y = get_random_velocity(y, player_y, max_velocity);
     let translation = Vec3::new(x / 2.0, y / 2.0, 900.0);
     println!("velocity {:?} {:?}", velocity_x, velocity_y);
     return (translation, velocity_x, velocity_y);
