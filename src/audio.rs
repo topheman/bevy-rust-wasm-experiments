@@ -27,6 +27,7 @@ fn play_sounds(
     for event in collision_events.iter() {
         match event {
             CollisionEvent::BallWall => audio.play(ball_wall_sound.0.clone()),
+            _ => audio.play(ball_wall_sound.0.clone()),
         };
     }
 }

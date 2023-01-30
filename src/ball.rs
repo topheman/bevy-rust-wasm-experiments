@@ -9,6 +9,8 @@ use bevy_inspector_egui::Inspectable;
 use iyes_loopless::prelude::IntoConditionalSystem;
 use rand::Rng;
 
+use crate::ennemies::Ennemy;
+use crate::player::Player;
 use crate::resizable::Viewport;
 use crate::state::GameState;
 
@@ -55,11 +57,15 @@ impl Default for Ball {
 
 pub enum CollisionEvent {
     BallWall,
+    EnnemyEnnemy,
+    PlayerEnnemy,
 }
 
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(handle_ball_ball_collisions.run_in_state(GameState::Playing))
+        app
+            // .add_system(handle_ennemy_ennemy_collisions.run_in_state(GameState::Playing))
+            // .add_system(handle_player_ennemy_collisions.run_in_state(GameState::Playing))
             .add_system(handle_ball_wall_collisions.run_in_state(GameState::Playing))
             .add_system(move_balls_one_step.run_in_state(GameState::Playing));
     }
@@ -74,7 +80,20 @@ fn move_balls_one_step(mut balls_query: Query<(&Ball, &mut Transform)>, time: Re
     }
 }
 
-fn handle_ball_ball_collisions() {}
+// fn handle_ennemy_ennemy_collisions(
+//     mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
+//     viewport_res: Res<Viewport>,
+//     mut collision_events: EventWriter<CollisionEvent>,
+// ) {
+// }
+
+// fn handle_player_ennemy_collisions(
+//     mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
+//     mut player_query: Query<(&mut Ball, &mut Transform, With<Player>)>,
+//     viewport_res: Res<Viewport>,
+//     mut collision_events: EventWriter<CollisionEvent>,
+// ) {
+// }
 
 fn handle_ball_wall_collisions(
     mut balls_query: Query<(&mut Ball, &mut Transform)>,
