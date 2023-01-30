@@ -17,9 +17,16 @@ Install [wasm-server-runner](https://github.com/jakobhellermann/wasm-server-runn
 
 ```sh
 cargo install wasm-server-runner
+cargo install cargo-watch
 ```
 
-Then you can develop targetting the browser:
+The, you can develop in watch mode, targetting native:
+
+```sh
+cargo watch -q -c -x 'run --features bevy/dynamic'
+```
+
+Or you can develop targetting the browser:
 
 ```sh
 cargo run --target wasm32-unknown-unknown
