@@ -63,8 +63,7 @@ pub enum CollisionEvent {
 
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
-        app
-            // .add_system(handle_ennemy_ennemy_collisions.run_in_state(GameState::Playing))
+        app.add_system(handle_ennemy_ennemy_collisions.run_in_state(GameState::Playing))
             // .add_system(handle_player_ennemy_collisions.run_in_state(GameState::Playing))
             .add_system(handle_ball_wall_collisions.run_in_state(GameState::Playing))
             .add_system(move_balls_one_step.run_in_state(GameState::Playing));
@@ -80,12 +79,68 @@ fn move_balls_one_step(mut balls_query: Query<(&Ball, &mut Transform)>, time: Re
     }
 }
 
-// fn handle_ennemy_ennemy_collisions(
-//     mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
-//     viewport_res: Res<Viewport>,
-//     mut collision_events: EventWriter<CollisionEvent>,
-// ) {
-// }
+struct BallInfo {
+    pub velocity_x: f32,
+    pub velocity_y: f32,
+    pub radius: f32,
+    pub x: f32,
+    pub y: f32,
+}
+
+fn handle_ennemy_ennemy_collisions(
+    mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
+    viewport_res: Res<Viewport>,
+    mut collision_events: EventWriter<CollisionEvent>,
+) {
+    let mut iter = ennemies_query.iter_combinations_mut();
+    while let Some([(mut ball_left, transform_left, _), (mut ball_right, transform_right, _)]) =
+        iter.fetch_next()
+    {
+        if check_ball_ball_collision(
+            BallInfo {
+                velocity_x: ball_left.velocity_x,
+                velocity_y: ball_left.velocity_y,
+                radius: ball_left.radius,
+                x: transform_left.translation.x,
+                y: transform_left.translation.y,
+            },
+            BallInfo {
+                velocity_x: ball_right.velocity_x,
+                velocity_y: ball_right.velocity_y,
+                radius: ball_right.radius,
+                x: transform_right.translation.x,
+                y: transform_right.translation.y,
+            },
+        ) {
+            println!(
+                "implement collision {} {}",
+                ball_left.radius, ball_right.radius
+            )
+        }
+    }
+    // for (mut ball_left, transform_left, _) in ennemies_query.iter_mut() {
+    //     for (mut ball_right, transform_right, _) in ennemies_query.iter_mut() {
+    //         if check_ball_ball_collision(
+    //             BallInfo {
+    //                 velocity_x: ball_left.velocity_x,
+    //                 velocity_y: ball_left.velocity_y,
+    //                 radius: ball_left.radius,
+    //                 x: transform_left.translation.x,
+    //                 y: transform_left.translation.y,
+    //             },
+    //             BallInfo {
+    //                 velocity_x: ball_right.velocity_x,
+    //                 velocity_y: ball_right.velocity_y,
+    //                 radius: ball_right.radius,
+    //                 x: transform_right.translation.x,
+    //                 y: transform_right.translation.y,
+    //             },
+    //         ) {
+    //             println!("collision")
+    //         }
+    //     }
+    // }
+}
 
 // fn handle_player_ennemy_collisions(
 //     mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
@@ -122,6 +177,21 @@ fn handle_ball_wall_collisions(
             collision_events.send(CollisionEvent::BallWall);
         }
     }
+}
+
+fn check_ball_ball_collision(ball_left: BallInfo, ball_right: BallInfo) -> bool {
+    let xd = ball_left.x - ball_right.x;
+    let yd = ball_left.y - ball_right.y;
+
+    let sum_radius = ball_left.radius + ball_right.radius;
+    let sqr_radius = sum_radius * sum_radius;
+
+    let dist_sqr = xd * xd + yd * yd;
+
+    if dist_sqr <= sqr_radius {
+        return true;
+    }
+    return false;
 }
 
 fn get_safe_random_position(
