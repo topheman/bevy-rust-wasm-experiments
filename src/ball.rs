@@ -91,7 +91,6 @@ struct BallInfo {
 
 fn handle_ennemy_ennemy_collisions(
     mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
-    viewport_res: Res<Viewport>,
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
     let mut iter = ennemies_query.iter_combinations_mut();
@@ -127,6 +126,7 @@ fn handle_ennemy_ennemy_collisions(
                 ball_left.velocity_y = new_ball_left_velocity_y;
                 ball_right.velocity_x = new_ball_right_velocity_x;
                 ball_right.velocity_y = new_ball_right_velocity_y;
+                collision_events.send(CollisionEvent::EnnemyEnnemy);
             }
         }
     }

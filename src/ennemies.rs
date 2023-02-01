@@ -4,7 +4,7 @@ use crate::ball::{get_random_position_and_speed, Ball};
 use crate::player::Player;
 use crate::state::GameState;
 use crate::texture::{spawn_assets_sprite, BallTexture};
-use iyes_loopless::prelude::{AppLooplessStateExt, IntoConditionalSystem};
+use iyes_loopless::prelude::IntoConditionalSystem;
 
 pub const ENNEMY_SCALE: f32 = 0.7;
 pub const BALL_DEFAULT_RADIUS: f32 = 50.0;
