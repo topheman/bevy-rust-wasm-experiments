@@ -85,6 +85,8 @@ struct BallInfo {
     pub radius: f32,
     pub x: f32,
     pub y: f32,
+    pub mass: f32,
+    pub elasticity: f32,
 }
 
 fn handle_ennemy_ennemy_collisions(
@@ -96,26 +98,36 @@ fn handle_ennemy_ennemy_collisions(
     while let Some([(mut ball_left, transform_left, _), (mut ball_right, transform_right, _)]) =
         iter.fetch_next()
     {
-        if check_ball_ball_collision(
-            BallInfo {
-                velocity_x: ball_left.velocity_x,
-                velocity_y: ball_left.velocity_y,
-                radius: ball_left.radius,
-                x: transform_left.translation.x,
-                y: transform_left.translation.y,
-            },
-            BallInfo {
-                velocity_x: ball_right.velocity_x,
-                velocity_y: ball_right.velocity_y,
-                radius: ball_right.radius,
-                x: transform_right.translation.x,
-                y: transform_right.translation.y,
-            },
-        ) {
-            println!(
-                "implement collision {} {}",
-                ball_left.radius, ball_right.radius
-            )
+        let ball_info_left = BallInfo {
+            velocity_x: ball_left.velocity_x,
+            velocity_y: ball_left.velocity_y,
+            radius: ball_left.radius,
+            x: transform_left.translation.x,
+            y: transform_left.translation.y,
+            mass: ball_left.mass,
+            elasticity: ball_left.elasticity,
+        };
+        let ball_info_right = BallInfo {
+            velocity_x: ball_right.velocity_x,
+            velocity_y: ball_right.velocity_y,
+            radius: ball_right.radius,
+            x: transform_right.translation.x,
+            y: transform_right.translation.y,
+            mass: ball_right.mass,
+            elasticity: ball_right.elasticity,
+        };
+        if check_ball_ball_collision(&ball_info_left, &ball_info_right) {
+            println!("collision {} {}", ball_left.radius, ball_right.radius);
+            if let Some((
+                (new_ball_left_velocity_x, new_ball_left_velocity_y),
+                (new_ball_right_velocity_x, new_ball_right_velocity_y),
+            )) = resolve_ball_ball_collision(&ball_info_left, &ball_info_right)
+            {
+                ball_left.velocity_x = new_ball_left_velocity_x;
+                ball_left.velocity_y = new_ball_left_velocity_y;
+                ball_right.velocity_x = new_ball_right_velocity_x;
+                ball_right.velocity_y = new_ball_right_velocity_y;
+            }
         }
     }
     // for (mut ball_left, transform_left, _) in ennemies_query.iter_mut() {
@@ -179,7 +191,7 @@ fn handle_ball_wall_collisions(
     }
 }
 
-fn check_ball_ball_collision(ball_left: BallInfo, ball_right: BallInfo) -> bool {
+fn check_ball_ball_collision(ball_left: &BallInfo, ball_right: &BallInfo) -> bool {
     let xd = ball_left.x - ball_right.x;
     let yd = ball_left.y - ball_right.y;
 
@@ -192,6 +204,59 @@ fn check_ball_ball_collision(ball_left: BallInfo, ball_right: BallInfo) -> bool 
         return true;
     }
     return false;
+}
+
+fn get_vector_2d(ball_left: &BallInfo, ball_right: &BallInfo) -> Vector2D {
+    return Vector2D::new(ball_left.x - ball_right.x, ball_left.y - ball_right.y);
+}
+
+fn resolve_ball_ball_collision(
+    ball_left: &BallInfo,
+    ball_right: &BallInfo,
+) -> Option<((f32, f32), (f32, f32))> {
+    const RESTITUTION: f32 = 0.85;
+
+    //get the mtd
+    let delta = get_vector_2d(&ball_left, &ball_right);
+    let d = delta.get_length();
+    // minimum translation distance to push balls apart after intersecting
+    let mtd = delta.scale(((ball_left.radius + ball_right.radius) - d) / d);
+
+    // resolve intersection --
+    // inverse mass quantities
+    let im1 = 1.0 / ball_left.mass;
+    let im2 = 1.0 / ball_right.mass;
+
+    // impact speed
+    let vector_velocity = Vector2D::new(
+        ball_left.velocity_x - ball_right.velocity_x,
+        ball_left.velocity_y - ball_right.velocity_y,
+    );
+    let normalized_mtd = mtd.normalize();
+    let vn = vector_velocity.dot(&normalized_mtd);
+
+    // sphere intersecting but moving away from each other already
+    if vn > 0.0 {
+        return None;
+    }
+
+    // collision impulse
+    let i = (-(1.0 + RESTITUTION) * vn) / (im1 + im2);
+    let impulse = normalized_mtd.scale(i);
+
+    // change in momentum
+    let ims1 = impulse.scale(im1);
+    let ims2 = impulse.scale(im2);
+
+    let new_ball_left_velocity_x = (ball_left.velocity_x + ims1.x) * ball_left.elasticity;
+    let new_ball_left_velocity_y = (ball_left.velocity_y + ims1.y) * ball_left.elasticity;
+    let new_ball_right_velocity_x = (ball_right.velocity_x - ims2.x) * ball_left.elasticity;
+    let new_ball_right_velocity_y = (ball_right.velocity_y - ims2.y) * ball_left.elasticity;
+
+    return Some((
+        (new_ball_left_velocity_x, new_ball_left_velocity_y),
+        (new_ball_right_velocity_x, new_ball_right_velocity_y),
+    ));
 }
 
 fn get_safe_random_position(
@@ -265,4 +330,39 @@ pub fn get_random_position_and_speed(
     let translation = Vec3::new(x / 2.0, y / 2.0, 900.0);
     println!("velocity {:?} {:?}", velocity_x, velocity_y);
     return (translation, velocity_x, velocity_y);
+}
+
+/**
+ * Inpired by my own port from js to rust: https://github.com/topheman/rust-wasm-experiments/blob/master/crate/src/vector2D.rs
+ */
+
+pub struct Vector2D {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Vector2D {
+    pub fn new(x: f32, y: f32) -> Vector2D {
+        Vector2D { x, y }
+    }
+    pub fn get_length(&self) -> f32 {
+        f32::sqrt(self.x * self.x + self.y * self.y)
+        // Currently using Math.sqrt from the browser - consider using rust implementation ?
+        // (self.x * self.x + self.y * self.y).sqrt()
+    }
+    pub fn dot(&self, vector: &Vector2D) -> f32 {
+        self.x * vector.x + self.y * vector.y
+    }
+    pub fn normalize(&self) -> Vector2D {
+        Vector2D {
+            x: self.x / self.get_length(),
+            y: self.y / self.get_length(),
+        }
+    }
+    pub fn scale(&self, scale: f32) -> Vector2D {
+        Vector2D {
+            x: self.x * scale,
+            y: self.y * scale,
+        }
+    }
 }
