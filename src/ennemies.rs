@@ -7,7 +7,7 @@ use crate::texture::{spawn_assets_sprite, BallTexture};
 use iyes_loopless::prelude::{AppLooplessStateExt, IntoConditionalSystem};
 
 pub const ENNEMY_SCALE: f32 = 0.7;
-pub const BALL_DEFAULT_RADIUS: f32 = 100.0;
+pub const BALL_DEFAULT_RADIUS: f32 = 50.0;
 pub const MIN_ENNEMIES: usize = 2;
 
 pub struct EnnemiesPlugin;

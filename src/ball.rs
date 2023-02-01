@@ -168,24 +168,24 @@ fn handle_ball_wall_collisions(
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
     for (mut ball, mut transform) in balls_query.iter_mut() {
-        if (transform.translation.y + ball.radius / 2.0) > viewport_res.max_y() {
+        if (transform.translation.y + ball.radius) > viewport_res.max_y() {
             ball.velocity_y = -ball.velocity_y * ball.elasticity;
-            transform.translation.y = viewport_res.max_y() - ball.radius / 2.0;
+            transform.translation.y = viewport_res.max_y() - ball.radius;
             collision_events.send(CollisionEvent::BallWall);
         }
-        if (transform.translation.y - ball.radius / 2.0) < viewport_res.min_y() {
+        if (transform.translation.y - ball.radius) < viewport_res.min_y() {
             ball.velocity_y = -ball.velocity_y * ball.elasticity;
-            transform.translation.y = viewport_res.min_y() + ball.radius / 2.0;
+            transform.translation.y = viewport_res.min_y() + ball.radius;
             collision_events.send(CollisionEvent::BallWall);
         }
-        if (transform.translation.x + ball.radius / 2.0) > viewport_res.max_x() {
+        if (transform.translation.x + ball.radius) > viewport_res.max_x() {
             ball.velocity_x = -ball.velocity_x * ball.elasticity;
-            transform.translation.x = viewport_res.max_x() - ball.radius / 2.0;
+            transform.translation.x = viewport_res.max_x() - ball.radius;
             collision_events.send(CollisionEvent::BallWall);
         }
-        if (transform.translation.x - ball.radius / 2.0) < viewport_res.min_x() {
+        if (transform.translation.x - ball.radius) < viewport_res.min_x() {
             ball.velocity_x = -ball.velocity_x * ball.elasticity;
-            transform.translation.x = viewport_res.min_x() + ball.radius / 2.0;
+            transform.translation.x = viewport_res.min_x() + ball.radius;
             collision_events.send(CollisionEvent::BallWall);
         }
     }

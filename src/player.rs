@@ -10,7 +10,7 @@ use crate::state::{start_game, GameState};
 use crate::texture::{spawn_assets_sprite, BallTexture};
 
 pub const PLAYER_SCALE: f32 = 1.0;
-pub const BALL_DEFAULT_RADIUS: f32 = 100.0;
+pub const BALL_DEFAULT_RADIUS: f32 = 50.0;
 
 pub struct PlayerPlugin;
 
