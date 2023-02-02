@@ -9,7 +9,7 @@ use bevy_inspector_egui::Inspectable;
 use iyes_loopless::prelude::IntoConditionalSystem;
 use rand::Rng;
 
-use crate::ennemies::Ennemy;
+use crate::enemies::Enemy;
 use crate::player::Player;
 use crate::resizable::Viewport;
 use crate::state::GameState;
@@ -57,14 +57,13 @@ impl Default for Ball {
 
 pub enum CollisionEvent {
     BallWall,
-    EnnemyEnnemy,
-    PlayerEnnemy,
+    EnemyEnemy,
+    PlayerEnemy,
 }
 
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(handle_ball_ball_collisions.run_in_state(GameState::Playing))
-            // .add_system(handle_player_ennemy_collisions.run_in_state(GameState::Playing))
             .add_system(handle_ball_wall_collisions.run_in_state(GameState::Playing))
             .add_system(move_balls_one_step.run_in_state(GameState::Playing));
     }
@@ -90,10 +89,10 @@ struct BallInfo {
 }
 
 fn handle_ball_ball_collisions(
-    mut ennemies_query: Query<(&mut Ball, &mut Transform, Or<(With<Ennemy>, With<Player>)>)>, // todo identify player/ennemy to be able to send different CollisionEvent
+    mut enemies_query: Query<(&mut Ball, &mut Transform, Or<(With<Enemy>, With<Player>)>)>, // todo identify player/enemy to be able to send different CollisionEvent
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
-    let mut iter = ennemies_query.iter_combinations_mut();
+    let mut iter = enemies_query.iter_combinations_mut();
     while let Some([(mut ball_left, transform_left, _), (mut ball_right, transform_right, _)]) =
         iter.fetch_next()
     {
@@ -126,7 +125,7 @@ fn handle_ball_ball_collisions(
                 ball_left.velocity_y = new_ball_left_velocity_y;
                 ball_right.velocity_x = new_ball_right_velocity_x;
                 ball_right.velocity_y = new_ball_right_velocity_y;
-                collision_events.send(CollisionEvent::EnnemyEnnemy);
+                collision_events.send(CollisionEvent::EnemyEnemy);
             }
         }
     }
