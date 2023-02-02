@@ -59,9 +59,9 @@ impl Default for Ball {
 }
 
 pub enum CollisionEvent {
-    BallWall,
-    EnemyEnemy,
-    PlayerEnemy,
+    BallWall(Entity),
+    EnemyEnemy(Entity, Entity),
+    PlayerEnemy(Entity),
 }
 
 #[derive(PartialEq, Inspectable)]
@@ -98,12 +98,13 @@ struct BallInfo {
 }
 
 fn handle_ball_ball_collisions(
-    mut enemies_query: Query<(&mut Ball, &mut Transform)>,
+    mut enemies_query: Query<(&mut Ball, &mut Transform, Entity)>,
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
     let mut iter = enemies_query.iter_combinations_mut();
-    while let Some([(mut ball_left, transform_left), (mut ball_right, transform_right)]) =
-        iter.fetch_next()
+    while let Some(
+        [(mut ball_left, transform_left, entity_left), (mut ball_right, transform_right, entity_right)],
+    ) = iter.fetch_next()
     {
         let ball_info_left = BallInfo {
             velocity_x: ball_left.velocity_x,
@@ -135,9 +136,14 @@ fn handle_ball_ball_collisions(
                 ball_right.velocity_x = new_ball_right_velocity_x;
                 ball_right.velocity_y = new_ball_right_velocity_y;
                 if ball_left.kind == BallKind::Player || ball_right.kind == BallKind::Player {
-                    collision_events.send(CollisionEvent::PlayerEnemy);
+                    let ennemy_id = if ball_left.kind == BallKind::Enemy {
+                        entity_left
+                    } else {
+                        entity_right
+                    };
+                    collision_events.send(CollisionEvent::PlayerEnemy(ennemy_id));
                 } else {
-                    collision_events.send(CollisionEvent::EnemyEnemy);
+                    collision_events.send(CollisionEvent::EnemyEnemy(entity_left, entity_right));
                 }
             }
         }
@@ -145,30 +151,30 @@ fn handle_ball_ball_collisions(
 }
 
 fn handle_ball_wall_collisions(
-    mut balls_query: Query<(&mut Ball, &mut Transform)>,
+    mut balls_query: Query<(&mut Ball, &mut Transform, Entity)>,
     viewport_res: Res<Viewport>,
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
-    for (mut ball, mut transform) in balls_query.iter_mut() {
+    for (mut ball, mut transform, entity) in balls_query.iter_mut() {
         if (transform.translation.y + ball.radius) > viewport_res.max_y() {
             ball.velocity_y = -ball.velocity_y * ball.elasticity;
             transform.translation.y = viewport_res.max_y() - ball.radius;
-            collision_events.send(CollisionEvent::BallWall);
+            collision_events.send(CollisionEvent::BallWall(entity));
         }
         if (transform.translation.y - ball.radius) < viewport_res.min_y() {
             ball.velocity_y = -ball.velocity_y * ball.elasticity;
             transform.translation.y = viewport_res.min_y() + ball.radius;
-            collision_events.send(CollisionEvent::BallWall);
+            collision_events.send(CollisionEvent::BallWall(entity));
         }
         if (transform.translation.x + ball.radius) > viewport_res.max_x() {
             ball.velocity_x = -ball.velocity_x * ball.elasticity;
             transform.translation.x = viewport_res.max_x() - ball.radius;
-            collision_events.send(CollisionEvent::BallWall);
+            collision_events.send(CollisionEvent::BallWall(entity));
         }
         if (transform.translation.x - ball.radius) < viewport_res.min_x() {
             ball.velocity_x = -ball.velocity_x * ball.elasticity;
             transform.translation.x = viewport_res.min_x() + ball.radius;
-            collision_events.send(CollisionEvent::BallWall);
+            collision_events.send(CollisionEvent::BallWall(entity));
         }
     }
 }
