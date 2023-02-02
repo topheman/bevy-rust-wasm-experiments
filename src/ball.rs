@@ -63,7 +63,7 @@ pub enum CollisionEvent {
 
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(handle_ennemy_ennemy_collisions.run_in_state(GameState::Playing))
+        app.add_system(handle_ball_ball_collisions.run_in_state(GameState::Playing))
             // .add_system(handle_player_ennemy_collisions.run_in_state(GameState::Playing))
             .add_system(handle_ball_wall_collisions.run_in_state(GameState::Playing))
             .add_system(move_balls_one_step.run_in_state(GameState::Playing));
@@ -89,8 +89,8 @@ struct BallInfo {
     pub elasticity: f32,
 }
 
-fn handle_ennemy_ennemy_collisions(
-    mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
+fn handle_ball_ball_collisions(
+    mut ennemies_query: Query<(&mut Ball, &mut Transform, Or<(With<Ennemy>, With<Player>)>)>, // todo identify player/ennemy to be able to send different CollisionEvent
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
     let mut iter = ennemies_query.iter_combinations_mut();
@@ -130,37 +130,7 @@ fn handle_ennemy_ennemy_collisions(
             }
         }
     }
-    // for (mut ball_left, transform_left, _) in ennemies_query.iter_mut() {
-    //     for (mut ball_right, transform_right, _) in ennemies_query.iter_mut() {
-    //         if check_ball_ball_collision(
-    //             BallInfo {
-    //                 velocity_x: ball_left.velocity_x,
-    //                 velocity_y: ball_left.velocity_y,
-    //                 radius: ball_left.radius,
-    //                 x: transform_left.translation.x,
-    //                 y: transform_left.translation.y,
-    //             },
-    //             BallInfo {
-    //                 velocity_x: ball_right.velocity_x,
-    //                 velocity_y: ball_right.velocity_y,
-    //                 radius: ball_right.radius,
-    //                 x: transform_right.translation.x,
-    //                 y: transform_right.translation.y,
-    //             },
-    //         ) {
-    //             println!("collision")
-    //         }
-    //     }
-    // }
 }
-
-// fn handle_player_ennemy_collisions(
-//     mut ennemies_query: Query<(&mut Ball, &mut Transform, With<Ennemy>)>,
-//     mut player_query: Query<(&mut Ball, &mut Transform, With<Player>)>,
-//     viewport_res: Res<Viewport>,
-//     mut collision_events: EventWriter<CollisionEvent>,
-// ) {
-// }
 
 fn handle_ball_wall_collisions(
     mut balls_query: Query<(&mut Ball, &mut Transform)>,
