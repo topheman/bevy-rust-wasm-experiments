@@ -4,7 +4,7 @@ use iyes_loopless::prelude::{AppLooplessStateExt, CurrentState, IntoConditionalS
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::ball::Ball;
+use crate::ball::{Ball, BallKind};
 use crate::colors::{DEFAULT_COLOR, SLOW_DOWN_BACKGROUND_COLOR};
 use crate::state::{start_game, GameState};
 use crate::texture::{spawn_assets_sprite, BallTexture};
@@ -88,7 +88,12 @@ fn spawn_player(
     gamestate: Res<CurrentState<GameState>>,
 ) {
     let player_ball_component = (
-        Ball::new(30.0, 40.0, BALL_DEFAULT_RADIUS * PLAYER_SCALE),
+        Ball::new(
+            30.0,
+            40.0,
+            BALL_DEFAULT_RADIUS * PLAYER_SCALE,
+            BallKind::Player,
+        ),
         Player,
     );
     let player_entity = spawn_assets_sprite(

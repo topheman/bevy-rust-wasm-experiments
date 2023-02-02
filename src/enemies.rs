@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::ball::{get_random_position_and_speed, Ball};
+use crate::ball::{get_random_position_and_speed, Ball, BallKind};
 use crate::player::Player;
 use crate::state::GameState;
 use crate::texture::{spawn_assets_sprite, BallTexture};
@@ -89,7 +89,12 @@ fn spawn_enemy(
                     200.0,
                 );
                 let enemy_ball_component = (
-                    Ball::new(velocity_x, velocity_y, BALL_DEFAULT_RADIUS * ENEMY_SCALE),
+                    Ball::new(
+                        velocity_x,
+                        velocity_y,
+                        BALL_DEFAULT_RADIUS * ENEMY_SCALE,
+                        BallKind::Enemy,
+                    ),
                     Enemy { life: 20.0 },
                 );
                 let player_entity = spawn_assets_sprite(

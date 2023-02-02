@@ -27,14 +27,16 @@ pub struct Ball {
     pub friction: f32,
     pub speed_with_keyboard: f32,
     pub speed_with_accelerometer: f32,
+    pub kind: BallKind,
 }
 impl Ball {
     // public constructor, only expose public fields
-    pub fn new(velocity_x: f32, velocity_y: f32, radius: f32) -> Ball {
+    pub fn new(velocity_x: f32, velocity_y: f32, radius: f32, kind: BallKind) -> Ball {
         Ball {
             velocity_x,
             velocity_y,
             radius,
+            kind,
             ..default()
         }
     }
@@ -51,6 +53,7 @@ impl Default for Ball {
             friction: 0.8,
             speed_with_keyboard: 200.0,
             speed_with_accelerometer: 400.0,
+            kind: BallKind::Enemy,
         }
     }
 }
@@ -59,6 +62,12 @@ pub enum CollisionEvent {
     BallWall,
     EnemyEnemy,
     PlayerEnemy,
+}
+
+#[derive(PartialEq, Inspectable)]
+pub enum BallKind {
+    Enemy,
+    Player,
 }
 
 impl Plugin for BallPlugin {
@@ -89,11 +98,11 @@ struct BallInfo {
 }
 
 fn handle_ball_ball_collisions(
-    mut enemies_query: Query<(&mut Ball, &mut Transform, Or<(With<Enemy>, With<Player>)>)>, // todo identify player/enemy to be able to send different CollisionEvent
+    mut enemies_query: Query<(&mut Ball, &mut Transform)>,
     mut collision_events: EventWriter<CollisionEvent>,
 ) {
     let mut iter = enemies_query.iter_combinations_mut();
-    while let Some([(mut ball_left, transform_left, _), (mut ball_right, transform_right, _)]) =
+    while let Some([(mut ball_left, transform_left), (mut ball_right, transform_right)]) =
         iter.fetch_next()
     {
         let ball_info_left = BallInfo {
@@ -125,7 +134,11 @@ fn handle_ball_ball_collisions(
                 ball_left.velocity_y = new_ball_left_velocity_y;
                 ball_right.velocity_x = new_ball_right_velocity_x;
                 ball_right.velocity_y = new_ball_right_velocity_y;
-                collision_events.send(CollisionEvent::EnemyEnemy);
+                if ball_left.kind == BallKind::Player || ball_right.kind == BallKind::Player {
+                    collision_events.send(CollisionEvent::PlayerEnemy);
+                } else {
+                    collision_events.send(CollisionEvent::EnemyEnemy);
+                }
             }
         }
     }
