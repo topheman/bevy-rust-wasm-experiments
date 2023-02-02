@@ -37,7 +37,7 @@ cargo run --target wasm32-unknown-unknown
 Install [wasm-bindgen-cli](https://rustwasm.github.io/docs/wasm-bindgen/reference/cli.html)
 
 ```
-cargo install wasm-bindgen-cli
+cargo install wasm-bindgen-cli@0.2.84
 cargo install wasm-opt
 ```
 

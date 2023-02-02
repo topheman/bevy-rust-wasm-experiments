@@ -16,7 +16,7 @@ help:
 	@echo "rustup target install wasm32-unknown-unknown"
 	@echo "cargo install wasm-server-runner"
 	@echo "cargo install cargo-watch"
-	@echo "cargo install wasm-bindgen-cli"
+	@echo "cargo install wasm-bindgen-cli@0.2.84"
 	@echo "cargo install wasm-opt ${_GRAY}# for .wasm file size optimization${_END}"
 	@echo
 	@echo "${_GRAY}# If you want to do WebAssembly, install the web part${_END}"
