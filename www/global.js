@@ -35,8 +35,8 @@ window.get_orientation_y = function () {
 }
 
 function onDeviceOrientation(event) {
-  _orientation.x = event.gamma / 90;
-  _orientation.y = -event.beta / 90;
+  _orientation.x = event.gamma / 20;
+  _orientation.y = -event.beta / 20;
 }
 
 const requestAccessAsync = async () => {

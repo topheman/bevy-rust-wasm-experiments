@@ -50,7 +50,7 @@ impl Default for Ball {
             mass: 1.0,
             gravity: 1.0,
             elasticity: 0.98,
-            friction: 0.8,
+            friction: 0.1,
             speed_with_keyboard: 200.0,
             speed_with_accelerometer: 400.0,
             kind: BallKind::Enemy,
@@ -78,8 +78,10 @@ impl Plugin for BallPlugin {
     }
 }
 
-fn move_balls_one_step(mut balls_query: Query<(&Ball, &mut Transform)>, time: Res<Time>) {
-    for (ball, mut transform) in balls_query.iter_mut() {
+fn move_balls_one_step(mut balls_query: Query<(&mut Ball, &mut Transform)>, time: Res<Time>) {
+    for (mut ball, mut transform) in balls_query.iter_mut() {
+        ball.velocity_x = ball.velocity_x - ball.friction * ball.velocity_x * time.delta_seconds();
+        ball.velocity_y = ball.velocity_y - ball.friction * ball.velocity_y * time.delta_seconds();
         transform.translation.x =
             transform.translation.x + ball.gravity * ball.velocity_x * time.delta_seconds();
         transform.translation.y =
