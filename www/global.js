@@ -17,6 +17,29 @@ function resize_canvas(width, height) {
 window.resize_canvas = resize_canvas;
 
 /**
+ * Track display mode
+ */
+let _isPortrait;
+// for performance reasons, we want to avoid querying directly the DOM and prefer caching
+let _isPortraitTimer = setInterval(() => {
+  _isPortrait = window.innerHeight > window.innerWidth;
+}, 100);
+
+window.is_portrait = function () {
+  return _isPortrait;
+}
+
+/**
+ * Debugging function that should only be used in development
+ */
+window.debug_is_portrait = function (isPortrait) {
+  clearInterval(_isPortraitTimer);
+  _isPortrait = isPortrait
+}
+
+// todo track if we are in mobile (to avoid stopping loop in desktop mode)
+
+/**
  * Track orientation
  */
 const _orientation = {

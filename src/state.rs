@@ -7,6 +7,7 @@ pub enum GameState {
     PrepareGame,
     Playing,
     Pause,
+    Stopped(Box<GameState>),
     // GameOver,
 }
 
@@ -58,6 +59,30 @@ pub fn resume_game(mut commands: Commands, gamestate: Res<CurrentState<GameState
             "Impossible state, you can only run resume_game in GameState::Pause state, ran from {:?}",
             gamestate.0
         );
+    }
+}
+
+pub fn stop_loop(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+    println!("call stop_loop");
+    if gamestate.0 == GameState::Playing {
+        commands.insert_resource(NextState(GameState::Stopped(Box::new(GameState::Playing))))
+    } else if gamestate.0 == GameState::Pause {
+        commands.insert_resource(NextState(GameState::Stopped(Box::new(GameState::Pause))))
+    } else {
+        println!("Impossible state, you can only run stop_loop in GameState::{{Playing,Pause}} state, ran from {:?}", gamestate.0);
+    }
+}
+
+pub fn resume_loop(mut commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+    println!("call resume_loop");
+    match &gamestate.0 {
+        GameState::Stopped(boxed_prev_state) => {
+            let unboxed_prev_state = *(*boxed_prev_state).clone();
+            commands.insert_resource(NextState(unboxed_prev_state))
+        }
+        _ => {
+            println!("Impossible state, you can only run resume_loop in GameState::Stopped state, ran from {:?}", gamestate.0);
+        }
     }
 }
 
