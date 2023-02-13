@@ -16,28 +16,31 @@ function resize_canvas(width, height) {
 // vitejs only accepts <script type="module"/> so we must expose bindings on global scope so they are accessible
 window.resize_canvas = resize_canvas;
 
-/**
- * Track display mode
- */
-let _isPortrait;
-// for performance reasons, we want to avoid querying directly the DOM and prefer caching
-let _isPortraitTimer = setInterval(() => {
-  _isPortrait = window.innerHeight > window.innerWidth;
-}, 100);
+((win) => {
+  /**
+   * screen.orientation not available on safari ios, so we track it ourselves
+   */
+  let _isPortrait, _documentVisibilityState;
+  // for performance reasons, we want to avoid querying directly the DOM and prefer caching
+  function updateInfos() {
+    _isPortrait = /mobile/i.test(navigator.userAgent) && window.innerHeight > window.innerWidth;
+    _documentVisibilityState = document.visibilityState;
+  }
+  updateInfos();
+  let _isPortraitTimer = setInterval(updateInfos, 100);
 
-window.is_portrait = function () {
-  return _isPortrait;
-}
+  win.is_stopped = function () {
+    return !_isPortrait || _documentVisibilityState === 'hidden';
+  }
 
-/**
- * Debugging function that should only be used in development
- */
-window.debug_is_portrait = function (isPortrait) {
-  clearInterval(_isPortraitTimer);
-  _isPortrait = isPortrait
-}
-
-// todo track if we are in mobile (to avoid stopping loop in desktop mode)
+  /**
+   * Debugging function that should only be used in development
+   */
+  win.debug_is_stopped = function (isStopped) {
+    clearInterval(_isPortraitTimer);
+    _isPortrait = Boolean(isStopped);
+  }
+})(window)
 
 /**
  * Track orientation
