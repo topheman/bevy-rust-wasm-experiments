@@ -23,7 +23,7 @@ window.resize_canvas = resize_canvas;
   let _isPortrait, _documentVisibilityState;
   // for performance reasons, we want to avoid querying directly the DOM and prefer caching
   function updateInfos() {
-    _isPortrait = /mobile/i.test(navigator.userAgent) && window.innerHeight > window.innerWidth;
+    _isPortrait = /mobile/i.test(navigator.userAgent) ? window.innerHeight > window.innerWidth : true;
     _documentVisibilityState = document.visibilityState;
   }
   updateInfos();

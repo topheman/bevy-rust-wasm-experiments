@@ -14,6 +14,7 @@ mod enemies;
 mod player;
 mod resizable;
 mod state;
+mod stop_loop;
 mod texture;
 mod ui;
 
@@ -24,6 +25,7 @@ use enemies::EnemiesPlugin;
 use player::PlayerPlugin;
 use resizable::ResizablePlugin;
 use state::StatePlugin;
+use stop_loop::StopLoopPlugin;
 use texture::TexturePlugin;
 use ui::UiPlugin;
 
@@ -63,7 +65,8 @@ fn main() {
         .add_plugin(BallPlugin)
         .add_event::<CollisionEvent>()
         .add_plugin(UiPlugin)
-        .add_plugin(AudioPlugin);
+        .add_plugin(AudioPlugin)
+        .add_plugin(StopLoopPlugin);
 
     app.run()
 }
