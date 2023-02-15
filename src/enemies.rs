@@ -8,7 +8,7 @@ use iyes_loopless::prelude::IntoConditionalSystem;
 
 pub const ENEMY_SCALE: f32 = 0.7;
 pub const BALL_DEFAULT_RADIUS: f32 = 50.0;
-pub const MIN_ENEMIES: usize = 2;
+pub const MIN_ENEMIES: i32 = 2;
 
 pub struct EnemiesPlugin;
 
@@ -21,25 +21,12 @@ impl Plugin for EnemiesPlugin {
 }
 
 #[derive(Component)]
-pub struct Enemy {
-    life: f32,
-}
+pub struct Enemy;
 
 enum EnemyEvents {
     Spawn,
+    #[allow(unused)]
     Kill(Entity),
-}
-
-impl Enemy {
-    fn bounce_wall(&mut self) {
-        self.life -= 2.0;
-    }
-    fn bounce_player(&mut self) {
-        self.life -= 4.0;
-    }
-    fn is_dying(&self) -> bool {
-        return self.life < 6.0;
-    }
 }
 
 /**
@@ -53,7 +40,7 @@ fn spawn_enemies(
     for _ in query_enemies.into_iter() {
         count += 1;
     }
-    if count < 2 {
+    if count < MIN_ENEMIES {
         spawn_events.send(EnemyEvents::Spawn);
     }
 }
@@ -71,7 +58,6 @@ fn spawn_enemy(
     for event in spawn_events.iter() {
         match event {
             EnemyEvents::Spawn => {
-                println!("spawn_enemy");
                 let player = query_player.single();
                 let player_x = player.1.translation.x;
                 let player_y = player.1.translation.y;
@@ -95,7 +81,7 @@ fn spawn_enemy(
                         BALL_DEFAULT_RADIUS * ENEMY_SCALE,
                         BallKind::Enemy,
                     ),
-                    Enemy { life: 20.0 },
+                    Enemy,
                 );
                 let player_entity = spawn_assets_sprite(
                     &mut commands,

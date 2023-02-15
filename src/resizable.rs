@@ -59,12 +59,12 @@ fn on_resize_system(
         viewport.max_x = e.width / 2.0;
         viewport.min_y = -e.height / 2.0;
         viewport.max_y = e.height / 2.0;
-        println!(
-            "{}",
-            format!(
-                "{:.1} x {:.1} | {} {}",
-                e.width, e.height, viewport.width, viewport.height
-            )
-        );
+        // println!(
+        //     "{}",
+        //     format!(
+        //         "{:.1} x {:.1} | {} {}",
+        //         e.width, e.height, viewport.width, viewport.height
+        //     )
+        // );
     }
 }

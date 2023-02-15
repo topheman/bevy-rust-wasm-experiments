@@ -25,7 +25,6 @@ impl Plugin for UiPlugin {
             .add_exit_system(GameState::HomePage, despawn_with::<MainMenu>)
             .add_exit_system(GameState::HomePage, despawn_with::<Title>)
             .add_exit_system(GameState::HomePage, despawn_with::<Welcome>)
-            // .add_enter_system(GameState::Playing, playing)
             .add_enter_system(GameState::Pause, home_and_pause)
             .add_enter_system(GameState::Pause, pause)
             .add_enter_system(GameState::Pause, title)
@@ -237,23 +236,16 @@ fn title(mut commands: Commands, ass: Res<AssetServer>) {
 }
 
 fn home_and_pause(commands: Commands, ass: Res<AssetServer>) {
-    println!("home_page");
     instuctions(commands, &ass);
 }
 
-// fn playing() {
-//     println!("playing");
-// }
-
 fn pause(commands: Commands, ass: Res<AssetServer>, mut camera_query: Query<&mut Camera2d>) {
-    println!("pause");
     let mut camera = camera_query.single_mut();
     camera.clear_color = ClearColorConfig::Custom(DEFAULT_COLOR);
     make_button("Pause", commands, &ass);
 }
 
 fn home(commands: Commands, ass: Res<AssetServer>) {
-    println!("home");
     make_button("Start", commands, &ass);
 }
 

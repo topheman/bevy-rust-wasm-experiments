@@ -9,8 +9,6 @@ use bevy_inspector_egui::Inspectable;
 use iyes_loopless::prelude::IntoConditionalSystem;
 use rand::Rng;
 
-use crate::enemies::Enemy;
-use crate::player::Player;
 use crate::resizable::Viewport;
 use crate::state::GameState;
 
@@ -127,7 +125,6 @@ fn handle_ball_ball_collisions(
             elasticity: ball_right.elasticity,
         };
         if check_ball_ball_collision(&ball_info_left, &ball_info_right) {
-            println!("collision {} {}", ball_left.radius, ball_right.radius);
             if let Some((
                 (new_ball_left_velocity_x, new_ball_left_velocity_y),
                 (new_ball_right_velocity_x, new_ball_right_velocity_y),
@@ -273,7 +270,6 @@ fn get_safe_random_positions(
     safe_zone_max_y: f32,
 ) -> (f32, f32) {
     let result = loop {
-        println!("get_safe_random_positions");
         let (x, unsafe_x) =
             get_safe_random_position(window_width, safe_zone_min_x, safe_zone_max_x);
         let (y, unsafe_y) =
@@ -318,7 +314,6 @@ pub fn get_random_position_and_speed(
     let velocity_x = get_random_velocity(x, player_x, max_velocity);
     let velocity_y = get_random_velocity(y, player_y, max_velocity);
     let translation = Vec3::new(x / 2.0, y / 2.0, 900.0);
-    println!("velocity {:?} {:?}", velocity_x, velocity_y);
     return (translation, velocity_x, velocity_y);
 }
 

@@ -1,10 +1,4 @@
-use bevy::{
-    core_pipeline::clear_color::ClearColorConfig,
-    // diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
-    prelude::*,
-    // render::render_resource::Texture,
-    window::PresentMode,
-};
+use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*, window::PresentMode};
 
 mod audio;
 mod ball;
