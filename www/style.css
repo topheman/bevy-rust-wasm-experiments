@@ -33,3 +33,41 @@ canvas#bevy {
 .playing #presentation {
   display: none;
 }
+
+/**
+ * Based on https://github.com/topheman/bombs/blob/master/src/css/game.css
+ */
+#orientationlock {
+  font-style: italic;
+  font-weight: bold;
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: #333;
+  color: #fff;
+  font-size: 1.2em;
+  padding: 1em;
+  padding-top: 30vh;
+  display: none;
+  text-align: center;
+  background-image: url(public/orientation-lock.png);
+  background-repeat: no-repeat;
+  background-position: 50% 70%;
+}
+
+@media screen and (orientation:landscape) {
+  .is-mobile.playing #orientationlock {
+      display: block;
+  }
+  .is-mobile.playing #bevy{
+      display:none;
+  }
+}
+@media screen and (orientation:portrait) {
+  .is-mobile.playing #orientationlock {
+      display: none;
+  }
+}

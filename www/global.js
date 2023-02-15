@@ -17,6 +17,9 @@ function resize_canvas(width, height) {
 window.resize_canvas = resize_canvas;
 
 ((win) => {
+  if (/mobile/i.test(navigator.userAgent)) {
+    document.body.classList.add('is-mobile');
+  }
   /**
    * screen.orientation not available on safari ios, so we track it ourselves
    */
