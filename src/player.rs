@@ -1,11 +1,10 @@
-use bevy::core_pipeline::clear_color::ClearColorConfig;
 use bevy::prelude::*;
 use iyes_loopless::prelude::{AppLooplessStateExt, CurrentState, IntoConditionalSystem};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::ball::{Ball, BallKind};
-use crate::colors::{DEFAULT_COLOR, SLOW_DOWN_BACKGROUND_COLOR};
+use crate::enemies::EnemyEvents;
 use crate::state::{start_game, GameState};
 use crate::texture::{spawn_assets_sprite, BallTexture};
 
@@ -43,13 +42,12 @@ pub struct Player;
 
 fn handle_player_input(
     mut player_query: Query<&mut Ball, With<Player>>,
-    mut camera_query: Query<&mut Camera2d>,
     mouse: Res<Input<MouseButton>>,
     keyboard: Res<Input<KeyCode>>,
+    mut spawn_events: EventWriter<EnemyEvents>,
     time: Res<Time>,
 ) {
     let mut ball = player_query.single_mut();
-    let mut camera = camera_query.single_mut();
 
     if keyboard.pressed(KeyCode::Up) {
         ball.velocity_y += ball.speed_with_keyboard * time.delta_seconds();
@@ -63,13 +61,8 @@ fn handle_player_input(
     if keyboard.pressed(KeyCode::Right) {
         ball.velocity_x += ball.speed_with_keyboard * time.delta_seconds();
     }
-    if keyboard.pressed(KeyCode::Space) || mouse.pressed(MouseButton::Left) {
-        ball.velocity_x = ball.velocity_x * 0.98;
-        ball.velocity_y = ball.velocity_y * 0.98;
-        camera.clear_color = ClearColorConfig::Custom(SLOW_DOWN_BACKGROUND_COLOR);
-    } else {
-        // todo check if we need to change the color?
-        camera.clear_color = ClearColorConfig::Custom(DEFAULT_COLOR);
+    if keyboard.just_pressed(KeyCode::Space) || mouse.just_pressed(MouseButton::Left) {
+        spawn_events.send(EnemyEvents::Spawn);
     }
 
     // mobile with accelerometer

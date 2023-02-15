@@ -23,7 +23,7 @@ impl Plugin for EnemiesPlugin {
 #[derive(Component)]
 pub struct Enemy;
 
-enum EnemyEvents {
+pub enum EnemyEvents {
     Spawn,
     #[allow(unused)]
     Kill(Entity),

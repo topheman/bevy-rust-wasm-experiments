@@ -127,10 +127,10 @@ fn instuctions<'a, 'b>(mut commands: Commands<'a, 'b>, ass: &Res<AssetServer>) -
         // Create a TextBundle that has a Text with a single section.
         TextBundle::from_section(
             // Accepts a `String` or any type that converts into a `String`, such as `&str`
-            "P: pause\nSPACE/TAP: slow down the ball\nARROW keys: move the ball\n\nOn mobile, tilt your device",
+            "P: pause\n\nSPACE/TAP: add a ball to bounce with\n(min 2 balls / max 10 balls)\n\nARROW keys: move the ball\n\nOn mobile, tilt your device",
             TextStyle {
                 font: ass.load("m6x11.ttf"),
-                font_size: 24.0,
+                font_size: 20.0,
                 color: Color::WHITE,
             },
         ) // Set the alignment of the Text
