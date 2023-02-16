@@ -27,6 +27,24 @@ impl Plugin for EnemiesPlugin {
 #[derive(Component)]
 pub struct Enemy {
     timer: Timer,
+    pub lifespan: u64,
+    pub death_duration: u64,
+}
+
+impl Default for Enemy {
+    fn default() -> Self {
+        Enemy {
+            timer: Timer::new(Duration::from_secs(15), TimerMode::Once),
+            lifespan: 15,
+            death_duration: 4,
+        }
+    }
+}
+
+impl Enemy {
+    pub fn new() -> Enemy {
+        Enemy { ..default() }
+    }
 }
 
 pub enum EnemyEvents {
@@ -116,9 +134,7 @@ fn spawn_or_kill_enemy(
                             BALL_DEFAULT_RADIUS * ENEMY_SCALE,
                             BallKind::Enemy,
                         ),
-                        Enemy {
-                            timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
-                        },
+                        Enemy::new(),
                     );
                     let player_entity = spawn_assets_sprite(
                         &mut commands,
