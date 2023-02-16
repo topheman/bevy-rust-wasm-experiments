@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 
 use crate::ball::{get_random_position_and_speed, Ball, BallKind};
@@ -17,12 +19,15 @@ impl Plugin for EnemiesPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<EnemyEvents>()
             .add_system(spawn_enemies.run_in_state(GameState::Playing))
-            .add_system(spawn_enemy.run_in_state(GameState::Playing));
+            .add_system(kill_enemies.run_in_state(GameState::Playing))
+            .add_system(spawn_or_kill_enemy.run_in_state(GameState::Playing));
     }
 }
 
 #[derive(Component)]
-pub struct Enemy;
+pub struct Enemy {
+    timer: Timer,
+}
 
 pub enum EnemyEvents {
     Spawn,
@@ -35,21 +40,43 @@ pub enum EnemyEvents {
  */
 fn spawn_enemies(
     query_enemies: Query<(Entity, With<Enemy>)>,
-    mut spawn_events: EventWriter<EnemyEvents>,
+    mut enemy_events: EventWriter<EnemyEvents>,
 ) {
     let mut count = 0; // didn't found a method like .length or .size
     for _ in query_enemies.into_iter() {
         count += 1;
     }
     if count < MIN_ENEMIES {
-        spawn_events.send(EnemyEvents::Spawn);
+        enemy_events.send(EnemyEvents::Spawn);
+    }
+}
+
+fn kill_enemies(
+    mut query_enemies: Query<(Entity, &mut Enemy)>,
+    mut enemy_events: EventWriter<EnemyEvents>,
+    time: Res<Time>,
+) {
+    // tick each enemy timers + count how much enemies on the screen
+    let mut count = 0; // didn't found a method like .length or .size
+    for (_, mut enemy) in query_enemies.iter_mut() {
+        enemy.timer.tick(time.delta());
+        count += 1;
+    }
+
+    if count > MIN_ENEMIES {
+        for (entity, enemy) in query_enemies.iter() {
+            println!("enemy timer {:?} {:?}", enemy.timer, entity);
+            if enemy.timer.finished() {
+                enemy_events.send(EnemyEvents::Kill(entity));
+            }
+        }
     }
 }
 
 /**
  * Actual instanciating, answering to an event emitted in spawn_enemies
  */
-fn spawn_enemy(
+fn spawn_or_kill_enemy(
     mut commands: Commands,
     ball_texture: Res<BallTexture>,
     windows: Res<Windows>,
@@ -62,10 +89,10 @@ fn spawn_enemy(
         enemy_count += 1;
     }
 
-    if enemy_count < MAX_ENEMIES {
-        for event in spawn_events.iter() {
-            match event {
-                EnemyEvents::Spawn => {
+    for event in spawn_events.iter() {
+        match event {
+            EnemyEvents::Spawn => {
+                if enemy_count < MAX_ENEMIES {
                     let player = query_player.single();
                     let player_x = player.1.translation.x;
                     let player_y = player.1.translation.y;
@@ -89,7 +116,9 @@ fn spawn_enemy(
                             BALL_DEFAULT_RADIUS * ENEMY_SCALE,
                             BallKind::Enemy,
                         ),
-                        Enemy,
+                        Enemy {
+                            timer: Timer::new(Duration::from_secs(10), TimerMode::Once),
+                        },
                     );
                     let player_entity = spawn_assets_sprite(
                         &mut commands,
@@ -105,7 +134,11 @@ fn spawn_enemy(
                         .insert(enemy_ball_component)
                         .insert(Name::new("Enemy"));
                 }
-                _ => {}
+            }
+            EnemyEvents::Kill(entity) => {
+                // todo make a noise
+                // todo add a timer to animate kill
+                commands.entity(*entity).despawn();
             }
         }
     }
