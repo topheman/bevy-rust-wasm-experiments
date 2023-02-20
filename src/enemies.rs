@@ -12,6 +12,8 @@ pub const ENEMY_SCALE: f32 = 0.7;
 pub const BALL_DEFAULT_RADIUS: f32 = 50.0;
 pub const MIN_ENEMIES: i32 = 2;
 pub const MAX_ENEMIES: i32 = 10;
+const LIFESPAN_SECS: u64 = 14;
+const DYING_DURATION: f32 = 0.2;
 
 pub struct EnemiesPlugin;
 
@@ -33,8 +35,8 @@ pub struct Enemy {
 impl Default for Enemy {
     fn default() -> Self {
         Enemy {
-            life_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
-            dying_timer: Timer::new(Duration::from_secs(2), TimerMode::Once),
+            life_timer: Timer::new(Duration::from_secs(LIFESPAN_SECS), TimerMode::Once),
+            dying_timer: Timer::new(Duration::from_secs_f32(DYING_DURATION), TimerMode::Once),
         }
     }
 }
@@ -81,7 +83,7 @@ fn spawn_enemies(
 }
 
 fn kill_enemies(
-    mut query_enemies: Query<(Entity, &mut Enemy)>,
+    mut query_enemies: Query<(Entity, &mut Enemy, &mut Transform, &mut Ball)>,
     mut enemy_events: EventWriter<EnemyEvents>,
     time: Res<Time>,
 ) {
@@ -91,17 +93,17 @@ fn kill_enemies(
     }
 
     if count > MIN_ENEMIES {
-        for (_, mut enemy) in query_enemies.iter_mut() {
+        for (_, mut enemy, _, _) in query_enemies.iter_mut() {
             enemy.tick(time.delta());
         }
-        for (entity, enemy) in query_enemies.iter() {
-            println!(
-                "enemy life_timer {:?} dying timer {:?} {:?}",
-                enemy.life_timer, enemy.dying_timer, entity
-            );
+        for (entity, enemy, mut transform, mut ball) in query_enemies.iter_mut() {
             if enemy.is_dead() {
                 enemy_events.send(EnemyEvents::Kill(entity));
-            }
+            } else if enemy.is_dying() {
+                transform.scale *= 0.80;
+                ball.radius *= 0.80;
+                println!("scale {:?} radius {:?}", transform.scale, ball.radius);
+            };
         }
     }
 }
@@ -168,7 +170,6 @@ fn spawn_or_kill_enemy(
             }
             EnemyEvents::Kill(entity) => {
                 // todo make a noise
-                // todo add a timer to animate kill
                 commands.entity(*entity).despawn();
             }
         }
