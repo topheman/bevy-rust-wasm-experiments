@@ -26,17 +26,15 @@ impl Plugin for EnemiesPlugin {
 
 #[derive(Component)]
 pub struct Enemy {
-    timer: Timer,
-    pub lifespan: u64,
-    pub death_duration: u64,
+    life_timer: Timer,
+    dying_timer: Timer,
 }
 
 impl Default for Enemy {
     fn default() -> Self {
         Enemy {
-            timer: Timer::new(Duration::from_secs(15), TimerMode::Once),
-            lifespan: 15,
-            death_duration: 4,
+            life_timer: Timer::new(Duration::from_secs(4), TimerMode::Once),
+            dying_timer: Timer::new(Duration::from_secs(2), TimerMode::Once),
         }
     }
 }
@@ -44,6 +42,19 @@ impl Default for Enemy {
 impl Enemy {
     pub fn new() -> Enemy {
         Enemy { ..default() }
+    }
+    pub fn is_dying(&self) -> bool {
+        self.life_timer.finished()
+    }
+    pub fn is_dead(&self) -> bool {
+        self.dying_timer.finished()
+    }
+    pub fn tick(&mut self, delta: Duration) {
+        if !self.is_dying() {
+            self.life_timer.tick(delta);
+        } else {
+            self.dying_timer.tick(delta);
+        }
     }
 }
 
@@ -74,17 +85,21 @@ fn kill_enemies(
     mut enemy_events: EventWriter<EnemyEvents>,
     time: Res<Time>,
 ) {
-    // tick each enemy timers + count how much enemies on the screen
     let mut count = 0; // didn't found a method like .length or .size
-    for (_, mut enemy) in query_enemies.iter_mut() {
-        enemy.timer.tick(time.delta());
+    for _ in query_enemies.iter() {
         count += 1;
     }
 
     if count > MIN_ENEMIES {
+        for (_, mut enemy) in query_enemies.iter_mut() {
+            enemy.tick(time.delta());
+        }
         for (entity, enemy) in query_enemies.iter() {
-            println!("enemy timer {:?} {:?}", enemy.timer, entity);
-            if enemy.timer.finished() {
+            println!(
+                "enemy life_timer {:?} dying timer {:?} {:?}",
+                enemy.life_timer, enemy.dying_timer, entity
+            );
+            if enemy.is_dead() {
                 enemy_events.send(EnemyEvents::Kill(entity));
             }
         }
