@@ -31,6 +31,7 @@ impl Plugin for UiPlugin {
             .add_exit_system(GameState::Pause, despawn_with::<MainMenu>)
             .add_exit_system(GameState::Pause, despawn_with::<Title>)
             .add_exit_system(GameState::Pause, despawn_with::<Welcome>)
+            .add_system(handle_keyboard_pause)
             .add_system(handle_main_btn_click)
             .add_system(handle_pause_btn_click)
             .add_system(handle_pause_btn_hover)
@@ -313,6 +314,20 @@ fn handle_main_btn_hover(
         match interaction {
             Interaction::Hovered => window.set_cursor_icon(CursorIcon::Hand),
             _ => {}
+        }
+    }
+}
+
+fn handle_keyboard_pause(
+    commands: Commands,
+    keyboard: Res<Input<KeyCode>>,
+    gamestate: Res<CurrentState<GameState>>,
+) {
+    if keyboard.just_pressed(KeyCode::P) {
+        if gamestate.0 == GameState::Playing {
+            pause_game(commands, gamestate);
+        } else if gamestate.0 == GameState::Pause {
+            resume_game(commands, gamestate);
         }
     }
 }
