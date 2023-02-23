@@ -170,7 +170,13 @@ fn spawn_or_kill_enemy(
             }
             EnemyEvents::Kill(entity) => {
                 // todo make a noise
-                commands.entity(*entity).despawn();
+                /*
+                 `commands.entity(*entity).despawn()` panics in bevy/dynamic mode
+                  So we make sure we have an EntityCommands before we access it.
+                */
+                if let Some(mut entity_command) = commands.get_entity(*entity) {
+                    entity_command.despawn();
+                }
             }
         }
     }
