@@ -3,7 +3,15 @@ body, html {
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: blue;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,h2,h3,a {
+  color: #900000;
+}
+
+.text-center {
+  text-align: center;
 }
 
 @media (pointer: none) {
@@ -28,6 +36,44 @@ canvas#bevy {
 
 #presentation {
   display: block;
+  padding: 1rem;
+}
+
+@media screen and (max-width: 600px) {
+  #presentation h1 {
+    font-size: 1.4rem;
+  }
+}
+
+#presentation .logo-wrapper {
+  text-align: center;
+}
+
+#presentation .logo-wrapper img {
+  width: 100%;
+  max-width: 445px;
+}
+
+#presentation #start {
+  width: 100%;
+  max-width: 600px;
+  padding: 8px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  background-color: #ffe8e8;
+  border: 1px solid #900000;
+  border-radius: 12px;
+  color: #900000;
+}
+
+#presentation #start:hover {
+  color: white;
+  background-color: #900000;
+}
+
+#presentation footer {
+  font-size: 85%;
+  text-align: center;
 }
 
 .playing #presentation {
