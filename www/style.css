@@ -99,7 +99,7 @@ canvas#bevy {
   padding-top: 30vh;
   display: none;
   text-align: center;
-  background-image: url(public/orientation-lock.png);
+  background-image: url(/orientation-lock.png);
   background-repeat: no-repeat;
   background-position: 50% 70%;
 }
