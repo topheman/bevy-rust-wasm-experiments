@@ -12,6 +12,27 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+
+  build-wasm:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: wasm32-unknown-unknown
+        override: true
+    - name: install wasm-bindgen-cli
+      run: |
+        cargo install wasm-bindgen-cli@0.2.84
+    - name: install wasm-opt
+      run: |
+        cargo install wasm-opt
+    - name: Build
+      run: make wasm-build-opt
+
   build-www:
 
     runs-on: ubuntu-latest
