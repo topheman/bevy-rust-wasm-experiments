@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-www:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Node 🥣
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - run: node -v
+    - run: npm -v
+    - name: Install www dependencies
+      run: npm install
+      working-directory: ./www
+    - name: Install Vercel CLI
+      run: npm install --global vercel@latest
+      working-directory: ./www
+    - name: Pull Vercel Environment Information
+      run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      working-directory: ./www
+    - name: Build Project Artifacts
+      run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      working-directory: ./www
+    - name: Deploy Project Artifacts to Vercel
+      run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      working-directory: ./www
