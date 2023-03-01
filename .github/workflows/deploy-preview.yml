@@ -1,10 +1,11 @@
-name: Deploy
+name: Deploy preview
 
 on:
   push:
-    branches: [ "develop" ]
+    branches-ignore:
+      - 'master'
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "master" ]
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -15,7 +16,7 @@ jobs:
 
   fake-build-wasm:
 
-    if: true
+    if: false
 
     runs-on: ubuntu-latest
 
@@ -32,7 +33,7 @@ jobs:
 
   build-wasm:
 
-    if: false
+    if: true
 
     runs-on: ubuntu-latest
 
@@ -54,7 +55,7 @@ jobs:
 
   build-www:
 
-    needs: fake-build-wasm
+    needs: build-wasm
 
     runs-on: ubuntu-latest
 
