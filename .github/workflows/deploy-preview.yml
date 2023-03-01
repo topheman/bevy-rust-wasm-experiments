@@ -49,6 +49,12 @@ jobs:
         cargo install wasm-opt
     - name: Build
       run: make wasm-build-opt
+    - name: Cache wasm-bindgen output
+      uses: actions/cache@v3
+      with:
+        path: www/public/out
+        key: wasm-${{ github.run_id }}
+        restore-keys: wasm-
 
   build-www:
 
