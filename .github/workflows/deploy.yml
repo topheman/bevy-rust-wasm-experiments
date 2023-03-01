@@ -35,6 +35,8 @@ jobs:
 
   build-www:
 
+    needs: build-wasm
+
     runs-on: ubuntu-latest
 
     steps:
