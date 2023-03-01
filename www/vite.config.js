@@ -6,7 +6,7 @@ const htmlPlugin = () => {
     transformIndexHtml(html) {
       return html.replace(
         /WEBSITE_BASE_PATH/g,
-        process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}` || process.env.WEBSITE_BASE_PATH || "http://localhost:3000",
+        process.env.WEBSITE_BASE_PATH || "http://localhost:3000",
       )
     },
   }
