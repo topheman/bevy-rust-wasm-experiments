@@ -31,8 +31,17 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
   </head>
   <body>
-    <script type="module" src="./global.js"></script>
-    <script type="module" src="./main.js"></script>
+    <canvas id="bevy"></canvas>
+    <div id="orientationlock">Please lock your device in portrait mode to use this game.</div>
+    <div id="presentation">
+        <h1>bevy-rust-wasm-experiments</h1>
+        <p class="logo-wrapper"><img src="./bevy-rust-wasm-experiments-logo-445x380.png" /></p>
+        <p class="text-center"><button id="start">PLAY</button></p>
+        <p class="text-center">or snap the Qrcode below to play with your mobile device 👇</p>
+        <p class="text-center"><qrcode-display width="160" height="160"></qrcode-display></p>
+        <p class="text-center"><a href="https://github.com/topheman/bevy-rust-wasm-experiments">Check sources on github</a></p>
+        <footer-display from="2023"></footer-display>
+    </div>
     <script>
 // Insert hack to make sound autoplay on Chrome as soon as the user interacts with the tab:
 // https://developers.google.com/web/updates/2018/11/web-audio-autoplay#moving-forward
@@ -97,15 +106,8 @@
     });
 })();
     </script>
-    <canvas id="bevy"></canvas>
-    <div id="orientationlock">Please lock your device in portrait mode to use this game.</div>
-    <div id="presentation">
-        <h1>bevy-rust-wasm-experiments</h1>
-        <p class="logo-wrapper"><img src="./bevy-rust-wasm-experiments-logo-445x380.png" /></p>
-        <p class="text-center"><button id="start">PLAY</button></p>
-        <p class="text-center">TODO ADD QRCODE</p>
-        <p class="text-center"><a href="https://github.com/topheman/bevy-rust-wasm-experiments">Check sources on github</a></p>
-        <footer-display from="2023"></footer-display>
-    </div>
+    <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script type="module" src="./global.js"></script>
+    <script type="module" src="./main.js"></script>
   </body>
 </html>
