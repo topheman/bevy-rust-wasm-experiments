@@ -9,6 +9,7 @@ env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   CARGO_TERM_COLOR: always
+  GITHUB_SHA: ${{ github.sha }}
 
 jobs:
 
@@ -92,5 +93,19 @@ jobs:
       run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       working-directory: ./www
     - name: Deploy Project Artifacts to Vercel
-      run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > /tmp/deployment-url.txt
       working-directory: ./www
+    - name: Comment on PR
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          let fs = require('fs');
+          let deploymentUrl = fs.readFileSync('/tmp/deployment-url.txt');
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: `✅ Preview ${deploymentUrl}\n\nBuilt with commit ${process.env.GITHUB_SHA}`
+          });
+
