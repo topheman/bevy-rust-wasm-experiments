@@ -80,6 +80,12 @@ canvas#bevy {
   display: none;
 }
 
+qrcode-display {
+  display: block;
+  width: 160px;
+  margin: 0 auto;
+}
+
 /**
  * Based on https://github.com/topheman/bombs/blob/master/src/css/game.css
  */
