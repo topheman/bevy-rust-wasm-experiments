@@ -1,15 +1,15 @@
 # bevy-rust-wasm-experiments
 
-<p style="text-align:center;"><img src="www/public/bevy-rust-wasm-experiments-logo-445x380.png" /></p>
+[![Demo](https://img.shields.io/badge/demo-online-blue.svg)](https://bevy-rust-wasm-experiments.vercel.app/)
 
-Ten years ago, I made a small video game in JavaScript that you can play on your smartphone's browser: [topheman/bombs](https://topheman.github.io/bombs/).
+<p style="text-align:center;"><a href="https://bevy-rust-wasm-experiments.vercel.app/"><img src="www/public/bevy-rust-wasm-experiments-logo-445x380.png" /></a></p>
 
-The current project is a proof of concept that aims to demonstrate how to code a video game in rust and compile both to:
+This project is a proof of concept that aims to demonstrate how to code a video game in rust that compiles both to:
 
-- a binary executable on OS desktop such as MacOS, Linux, Windows ...
+- a binary executable on OS desktop such as MacOS, Linux or Windows ...
 - a web site, that you could access with any browser (via WebAssembly)
 
-the web version shipping with some features in addition, such as accelerometer support (if you load it on your smartphone), which should integrate seemlessly into the rust source code.
+The web version is shipping with some features in addition, such as accelerometer support (if you load it on your smartphone 📱), which should integrate seemlessly into the rust source code.
 
 ## Previous work
 
@@ -18,6 +18,24 @@ In the last five years I've done a few projects involving rust and WebAssembly:
 - [topheman/webassembly-wasi-experiments](https://github.com/topheman/webassembly-wasi-experiments): Discover WebAssembly System Interface (WASI) with C/Rust targetting NodeJS, python, Wasmtime and the browser
 - [topheman/rust-wasm-experiments](https://github.com/topheman/rust-wasm-experiments): Discover how to use Rust to generate WebAssembly, called by JavaScript
   - [📺🇫🇷 Utiliser WebAssembly, dès aujourd'hui - ParisJS #86](https://www.youtube.com/watch?v=F3wOfWIFzVc&list=PLWhFHBFsRtquZ6hVXVjXmJ-l51ZXuSBtb)
+
+Ten years ago, I made a small video game in JavaScript that you can play on your smartphone's browser: [topheman/bombs](https://topheman.github.io/bombs/) which inspired this current project.
+
+## Summary
+
+- [Contributing](#contributing)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+  - [Folder organization](#folder-organization)
+  - [Development](#development)
+    - [Desktop](#desktop)
+    - [WebAssembly](#webassembly)
+    - [Web part](#web-part)
+  - [Production](#production)
+- [CI/CD](#cicd)
+- [https](#https)
+- [Assets](#assets)
+- [Resources](#resources)
 
 ## Contributing
 
@@ -107,6 +125,18 @@ Same as `make www-build`, but [wasm-opt](https://lib.rs/crates/wasm-opt) is run 
 ```sh
 make www-build-opt
 ```
+
+## CI/CD
+
+I'm using github-actions for the CI and I deploy to vercel from there (can't use vercel for the whole pipeline since we need the rust toolchain with WebAssembly).
+
+On each pull request:
+
+1. the project is compiled from rust to WebAssembly
+2. the WebAssembly output goes through `wasm-bindgen` which generates the glue code between wasm and JavaScript (it also goes through `wasm-opt` to optimize the size of the wasm file)
+2. the output from the previous step is fed up to the vite pipeline which generates a static site
+4. finally, the website is automatically published to vercel
+5. a comment is left on the PR with the generated url of the deployment
 
 ## https
 
