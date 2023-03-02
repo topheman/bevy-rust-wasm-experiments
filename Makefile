@@ -9,19 +9,6 @@ _SUCCESS        = ${_GREEN}${_BOLD}
 _SUCCESS_LIGHT  = ${_GREEN}
 
 help:
-	@echo ""
-	@echo "${_GRAY}# setup section${_END}"
-	@echo "${_GRAY}#${_END}"
-	@echo "${_GRAY}# To setup your environment, launch the following from the root of the project${_END}"
-	@echo "rustup target install wasm32-unknown-unknown"
-	@echo "cargo install wasm-server-runner"
-	@echo "cargo install cargo-watch"
-	@echo "cargo install wasm-bindgen-cli@0.2.84"
-	@echo "cargo install wasm-opt ${_GRAY}# for .wasm file size optimization${_END}"
-	@echo
-	@echo "${_GRAY}# If you want to do WebAssembly, install the web part${_END}"
-	@echo "cd ./www && npm install"
-	@echo ""
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 desktop-dev: ## ▶️  Run desktop version in development
@@ -63,19 +50,25 @@ wasm-build-opt: ## ⚙️  Build wasm version with optimized file size
 	$(MAKE) wasm-build
 	$(MAKE) wasm-opt
 
-www-dev: ## ⚙️  Build wasm and launch website dev server via vite
+www-dev: ## ▶️  Build wasm and launch website dev server via vite
 	$(MAKE) wasm-build
+	$(MAKE) www-dev-only
+
+www-dev-only: ## ▶️  Launch vite dev server (doesn't build wasm)
 	cd www && npm run dev -- --host --port 3000
 
-www-build: ## ⚙️  Build wasm and buil website
+www-build: ## ⚙️  Build wasm and build website
 	$(MAKE) wasm-build
+	$(MAKE) www-build-only
+
+www-build-only: ## ⚙️  Build vite bundle (doesn't build wasm)
 	cd www && npm run build
 
 www-build-opt: ## ⚙️  Build wasm (optimized wasm file size) and build website
 	$(MAKE) wasm-build-opt
-	cd www && npm run build
+	$(MAKE) www-build-only
 
 www-preview: ## ▶️  Preview website's build
 	cd www && npm run preview -- --host --port 3000
 
-.PHONY: desktop-build desktop-dev wasm-build wasm-dev www-build www-dev www-preview
+.PHONY: desktop-build desktop-dev-watch desktop-dev forward-fallback forward wasm-build-opt wasm-build wasm-dev-release wasm-dev wasm-opt www-build-only www-build-opt www-build www-dev-only www-dev www-preview
