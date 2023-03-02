@@ -30,7 +30,25 @@ canvas#bevy {
   display: none;
 }
 
+button.back-home-page {
+  display: none;
+  cursor: pointer;
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  border: 4px solid #808080;
+  width: 36px;
+  height: 48px;
+  font-size: 22px;
+  background-color: white;
+  padding: 0px;
+}
+
 .playing canvas#bevy {
+  display: block;
+}
+
+.playing button.back-home-page {
   display: block;
 }
 
