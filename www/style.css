@@ -59,8 +59,13 @@ button.back-home-page {
 
 @media screen and (max-width: 600px) {
   #presentation h1 {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
+}
+
+#presentation h1.title {
+  max-width: 80%;
+  margin-top: 0px;
 }
 
 #presentation .logo-wrapper {

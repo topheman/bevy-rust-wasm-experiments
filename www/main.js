@@ -1,4 +1,5 @@
 import './style.css'
+import './network.css'
 
 import init from './public/out/bevy-rust-wasm-experiments'
 import './components/qrcode-display'
