@@ -43,7 +43,7 @@ a {
     ©${fromTo} - <a href="http://labs.topheman.com/">labs.topheman.com</a> - Christophe Rosset
 </p>
 <p>
-    <twitter-button text="A small video game developed in #Rust with #Bevy framework targeting both desktop and #WebAssembly" url="https://github.com/topheman/bevy-rust-wasm-experiments" via="topheman"></twitter-button>
+    <twitter-button text="🦀 A small video game developed in #Rust with #Bevy framework targeting both desktop and #WebAssembly" url="https://github.com/topheman/bevy-rust-wasm-experiments" via="topheman"></twitter-button>
 </p>
     `;
   }
