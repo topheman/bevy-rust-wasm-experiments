@@ -9,7 +9,7 @@ license = "MIT"
 [dependencies]
 bevy = "0.9.1"
 bevy-inspector-egui = "0.14.0"
-wasm-bindgen = "0.2.84"
+wasm-bindgen = "0.2.86"
 iyes_loopless = "0.9.1"
 getrandom = { version = "0.2.8", features = ["js"] }
 rand = "0.8.5"

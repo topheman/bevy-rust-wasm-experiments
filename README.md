@@ -57,7 +57,7 @@ cargo install wasm-server-runner # https://github.com/jakobhellermann/wasm-serve
 cargo install cargo-watch # https://github.com/watchexec/cargo-watch
 
 # Mandatory crates
-cargo install wasm-bindgen-cli@0.2.84 # cli for wasm-bindgen implementation shipped in Cargo.toml
+cargo install wasm-bindgen-cli@0.2.86 # cli for wasm-bindgen implementation shipped in Cargo.toml
 cargo install wasm-opt # cli that optimizes wasm payload
 ```
 

@@ -44,7 +44,7 @@ jobs:
         override: true
     - name: install wasm-bindgen-cli
       run: |
-        cargo install wasm-bindgen-cli@0.2.84
+        cargo install wasm-bindgen-cli@0.2.86
     - name: install wasm-opt
       run: |
         cargo install wasm-opt
