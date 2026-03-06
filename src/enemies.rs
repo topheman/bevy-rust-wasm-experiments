@@ -166,7 +166,7 @@ fn spawn_or_kill_enemy(
                 }
             }
             EnemyEvents::Kill(entity) => {
-                commands.entity(*entity).despawn();
+                commands.entity(*entity).try_despawn();
             }
         }
     }
