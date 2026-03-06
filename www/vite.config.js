@@ -13,6 +13,10 @@ const htmlPlugin = () => {
 }
 
 export default defineConfig({
+  // DEV ONLY: Disable SPA history fallback so that requests for nonexistent files (e.g. Bevy
+  // .meta sidecar files) return 404 instead of index.html, which would break asset loading.
+  // This is safe because we don't use frontend routing.
+  appType: 'mpa',
   build: {
     minify: false // temporary, wasm-bindgen js bindings must not be mangled
   },
