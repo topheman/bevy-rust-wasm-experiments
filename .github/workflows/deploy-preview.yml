@@ -75,9 +75,9 @@ jobs:
         path: www/public/out
         key: wasm-${{ github.run_id }}
     - name: Setup Node 🥣
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
-        node-version: 18
+        node-version-file: .nvmrc
     - run: node -v
     - run: npm -v
     - name: Install www dependencies
