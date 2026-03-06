@@ -62,6 +62,7 @@ fn top_menu(mut commands: Commands, ass: Res<AssetServer>) {
         align_items: AlignItems::Center,
         padding: UiRect::all(Val::Px(8.0)),
         margin: UiRect::all(Val::Px(4.0)),
+        border: UiRect::all(Val::Px(2.0)),
         flex_grow: 1.0,
         ..Default::default()
     };
@@ -80,7 +81,6 @@ fn top_menu(mut commands: Commands, ass: Res<AssetServer>) {
                 left: Val::Px(15.0),
                 ..Default::default()
             },
-            BackgroundColor(Color::srgb(0.5, 0.5, 0.5)),
             TopMenu,
         ))
         .id();
@@ -89,6 +89,8 @@ fn top_menu(mut commands: Commands, ass: Res<AssetServer>) {
         .spawn((
             Button,
             butt_style.clone(),
+            BackgroundColor(Color::WHITE),
+            BorderColor::all(Color::srgb(0.5, 0.5, 0.5)),
             PauseButton,
         ))
         .with_children(|btn| {
@@ -138,6 +140,7 @@ fn make_button<'a, 'b>(
         align_items: AlignItems::Center,
         padding: UiRect::all(Val::Px(8.0)),
         margin: UiRect::all(Val::Px(4.0)),
+        border: UiRect::all(Val::Px(2.0)),
         flex_grow: 1.0,
         ..Default::default()
     };
@@ -153,7 +156,6 @@ fn make_button<'a, 'b>(
                 justify_content: JustifyContent::Center,
                 ..Default::default()
             },
-            BackgroundColor(Color::srgb(0.5, 0.5, 0.5)),
             MainMenu,
         ))
         .id();
@@ -162,6 +164,8 @@ fn make_button<'a, 'b>(
         .spawn((
             Button,
             butt_style.clone(),
+            BackgroundColor(Color::WHITE),
+            BorderColor::all(Color::srgb(0.5, 0.5, 0.5)),
             MainButton,
         ))
         .with_children(|btn| {
