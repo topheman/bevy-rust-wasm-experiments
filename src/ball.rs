@@ -55,6 +55,7 @@ impl Default for Ball {
 }
 
 #[derive(Message)]
+#[allow(dead_code)]
 pub enum CollisionEvent {
     BallWall(Entity),
     EnemyEnemy(Entity, Entity),
