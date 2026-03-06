@@ -36,7 +36,7 @@ a {
 
   render() {
     const from = Number(this.getAttribute("from")) || 2023;
-    const to = Number(this.getAttribute("to")) || 2023;
+    const to = Number(this.getAttribute("to")) || new Date().getFullYear();
     const fromTo = from === to ? from : `${from}-${to}`;
     this.shadowRoot.querySelector("footer").innerHTML = `
 <p>
