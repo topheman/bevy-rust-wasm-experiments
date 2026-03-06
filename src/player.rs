@@ -43,6 +43,7 @@ fn handle_player_input(
     mut player_query: Query<&mut Ball, With<Player>>,
     mouse: Res<ButtonInput<MouseButton>>,
     keyboard: Res<ButtonInput<KeyCode>>,
+    touches: Res<Touches>,
     mut spawn_events: MessageWriter<EnemyEvents>,
     time: Res<Time>,
 ) {
@@ -60,7 +61,7 @@ fn handle_player_input(
     if keyboard.pressed(KeyCode::ArrowRight) {
         ball.velocity_x += ball.speed_with_keyboard * time.delta_secs();
     }
-    if keyboard.just_pressed(KeyCode::Space) || mouse.just_pressed(MouseButton::Left) {
+    if keyboard.just_pressed(KeyCode::Space) || mouse.just_pressed(MouseButton::Left) || touches.any_just_pressed() {
         spawn_events.write(EnemyEvents::Spawn);
     }
 
