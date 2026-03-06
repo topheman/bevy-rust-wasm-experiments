@@ -59,6 +59,10 @@ cargo install wasm-opt # cli that optimizes wasm payload
 # Optional crates for development
 cargo install wasm-server-runner # https://github.com/jakobhellermann/wasm-server-runner
 cargo install cargo-watch # https://github.com/watchexec/cargo-watch
+
+# For the web part, you need to install the dependencies:
+cd www
+npm install
 ```
 
 ### Folder organization
