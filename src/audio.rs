@@ -7,9 +7,8 @@ pub struct AudioPlugin;
 
 impl Plugin for AudioPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system_to_stage(StartupStage::PreStartup, load_sounds)
-            .add_system(play_enemy_sounds)
-            .add_system(play_collision_sounds);
+        app.add_systems(PreStartup, load_sounds)
+            .add_systems(Update, (play_enemy_sounds, play_collision_sounds));
     }
 }
 
@@ -17,7 +16,6 @@ impl Plugin for AudioPlugin {
 struct BallWallSound(Handle<AudioSource>);
 
 #[derive(Resource)]
-
 struct EnemyDyingSound(Handle<AudioSource>);
 
 fn load_sounds(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -28,29 +26,42 @@ fn load_sounds(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn play_collision_sounds(
-    mut collision_events: EventReader<CollisionEvent>,
-    audio: Res<Audio>,
+    mut commands: Commands,
+    mut collision_events: MessageReader<CollisionEvent>,
     ball_wall_sound: Res<BallWallSound>,
 ) {
-    for event in collision_events.iter() {
+    for event in collision_events.read() {
         match event {
-            CollisionEvent::BallWall(_) => audio.play(ball_wall_sound.0.clone()),
-            _ => audio.play(ball_wall_sound.0.clone()),
+            CollisionEvent::BallWall(_) => {
+                commands.spawn((
+                    AudioPlayer::new(ball_wall_sound.0.clone()),
+                    PlaybackSettings::DESPAWN,
+                ));
+            }
+            _ => {
+                commands.spawn((
+                    AudioPlayer::new(ball_wall_sound.0.clone()),
+                    PlaybackSettings::DESPAWN,
+                ));
+            }
         };
     }
 }
 
 fn play_enemy_sounds(
-    mut enemy_events: EventReader<EnemyEvents>,
-    audio: Res<Audio>,
+    mut commands: Commands,
+    mut enemy_events: MessageReader<EnemyEvents>,
     enemy_dying_sound: Res<EnemyDyingSound>,
 ) {
-    for event in enemy_events.iter() {
+    for event in enemy_events.read() {
         match event {
             EnemyEvents::Kill(_) => {
-                audio.play(enemy_dying_sound.0.clone());
+                commands.spawn((
+                    AudioPlayer::new(enemy_dying_sound.0.clone()),
+                    PlaybackSettings::DESPAWN,
+                ));
             }
-            _ => {} // todo add sound for Spawn
+            _ => {}
         };
     }
 }

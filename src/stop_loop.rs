@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use iyes_loopless::prelude::*;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -21,13 +20,13 @@ fn is_stopped() -> bool {
 
 impl Plugin for StopLoopPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(pause_or_resume_loop);
+        app.add_systems(Update, pause_or_resume_loop);
     }
 }
 
-fn pause_or_resume_loop(commands: Commands, gamestate: Res<CurrentState<GameState>>) {
+fn pause_or_resume_loop(commands: Commands, gamestate: Res<State<GameState>>) {
     let should_stop = is_stopped();
-    match &gamestate.0 {
+    match gamestate.get() {
         GameState::Playing | GameState::Pause => {
             if should_stop {
                 stop_loop(commands, gamestate)
