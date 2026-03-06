@@ -5,8 +5,6 @@
  * - https://github.com/topheman/bombs/blob/master/src/js/vendor/Ball.js
  */
 use bevy::prelude::*;
-use bevy_inspector_egui::Inspectable;
-use iyes_loopless::prelude::IntoConditionalSystem;
 use rand::Rng;
 
 use crate::resizable::Viewport;
@@ -14,7 +12,7 @@ use crate::state::GameState;
 
 pub struct BallPlugin;
 
-#[derive(Component, Inspectable)]
+#[derive(Component, Reflect)]
 pub struct Ball {
     pub velocity_x: f32,
     pub velocity_y: f32,
@@ -56,13 +54,14 @@ impl Default for Ball {
     }
 }
 
+#[derive(Message)]
 pub enum CollisionEvent {
     BallWall(Entity),
     EnemyEnemy(Entity, Entity),
     PlayerEnemy(Entity),
 }
 
-#[derive(PartialEq, Inspectable)]
+#[derive(PartialEq, Reflect)]
 pub enum BallKind {
     Enemy,
     Player,
@@ -70,20 +69,22 @@ pub enum BallKind {
 
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(handle_ball_ball_collisions.run_in_state(GameState::Playing))
-            .add_system(handle_ball_wall_collisions.run_in_state(GameState::Playing))
-            .add_system(move_balls_one_step.run_in_state(GameState::Playing));
+        app.add_systems(Update, (
+            handle_ball_ball_collisions.run_if(in_state(GameState::Playing)),
+            handle_ball_wall_collisions.run_if(in_state(GameState::Playing)),
+            move_balls_one_step.run_if(in_state(GameState::Playing)),
+        ));
     }
 }
 
 fn move_balls_one_step(mut balls_query: Query<(&mut Ball, &mut Transform)>, time: Res<Time>) {
     for (mut ball, mut transform) in balls_query.iter_mut() {
-        ball.velocity_x = ball.velocity_x - ball.friction * ball.velocity_x * time.delta_seconds();
-        ball.velocity_y = ball.velocity_y - ball.friction * ball.velocity_y * time.delta_seconds();
+        ball.velocity_x = ball.velocity_x - ball.friction * ball.velocity_x * time.delta_secs();
+        ball.velocity_y = ball.velocity_y - ball.friction * ball.velocity_y * time.delta_secs();
         transform.translation.x =
-            transform.translation.x + ball.gravity * ball.velocity_x * time.delta_seconds();
+            transform.translation.x + ball.gravity * ball.velocity_x * time.delta_secs();
         transform.translation.y =
-            transform.translation.y + ball.gravity * ball.velocity_y * time.delta_seconds();
+            transform.translation.y + ball.gravity * ball.velocity_y * time.delta_secs();
     }
 }
 
@@ -99,7 +100,7 @@ struct BallInfo {
 
 fn handle_ball_ball_collisions(
     mut enemies_query: Query<(&mut Ball, &mut Transform, Entity)>,
-    mut collision_events: EventWriter<CollisionEvent>,
+    mut collision_events: MessageWriter<CollisionEvent>,
 ) {
     let mut iter = enemies_query.iter_combinations_mut();
     while let Some(
@@ -140,9 +141,9 @@ fn handle_ball_ball_collisions(
                     } else {
                         entity_right
                     };
-                    collision_events.send(CollisionEvent::PlayerEnemy(ennemy_id));
+                    collision_events.write(CollisionEvent::PlayerEnemy(ennemy_id));
                 } else {
-                    collision_events.send(CollisionEvent::EnemyEnemy(entity_left, entity_right));
+                    collision_events.write(CollisionEvent::EnemyEnemy(entity_left, entity_right));
                 }
             }
         }
@@ -152,28 +153,28 @@ fn handle_ball_ball_collisions(
 fn handle_ball_wall_collisions(
     mut balls_query: Query<(&mut Ball, &mut Transform, Entity)>,
     viewport_res: Res<Viewport>,
-    mut collision_events: EventWriter<CollisionEvent>,
+    mut collision_events: MessageWriter<CollisionEvent>,
 ) {
     for (mut ball, mut transform, entity) in balls_query.iter_mut() {
         if (transform.translation.y + ball.radius) > viewport_res.max_y() {
             ball.velocity_y = -ball.velocity_y * ball.elasticity;
             transform.translation.y = viewport_res.max_y() - ball.radius;
-            collision_events.send(CollisionEvent::BallWall(entity));
+            collision_events.write(CollisionEvent::BallWall(entity));
         }
         if (transform.translation.y - ball.radius) < viewport_res.min_y() {
             ball.velocity_y = -ball.velocity_y * ball.elasticity;
             transform.translation.y = viewport_res.min_y() + ball.radius;
-            collision_events.send(CollisionEvent::BallWall(entity));
+            collision_events.write(CollisionEvent::BallWall(entity));
         }
         if (transform.translation.x + ball.radius) > viewport_res.max_x() {
             ball.velocity_x = -ball.velocity_x * ball.elasticity;
             transform.translation.x = viewport_res.max_x() - ball.radius;
-            collision_events.send(CollisionEvent::BallWall(entity));
+            collision_events.write(CollisionEvent::BallWall(entity));
         }
         if (transform.translation.x - ball.radius) < viewport_res.min_x() {
             ball.velocity_x = -ball.velocity_x * ball.elasticity;
             transform.translation.x = viewport_res.min_x() + ball.radius;
-            collision_events.send(CollisionEvent::BallWall(entity));
+            collision_events.write(CollisionEvent::BallWall(entity));
         }
     }
 }

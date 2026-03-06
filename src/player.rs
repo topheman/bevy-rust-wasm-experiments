@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use iyes_loopless::prelude::{AppLooplessStateExt, CurrentState, IntoConditionalSystem};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -32,8 +31,8 @@ fn get_orientation_y() -> f32 {
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_enter_system(GameState::PrepareGame, spawn_player)
-            .add_system(handle_player_input.run_in_state(GameState::Playing));
+        app.add_systems(OnEnter(GameState::PrepareGame), spawn_player)
+            .add_systems(Update, handle_player_input.run_if(in_state(GameState::Playing)));
     }
 }
 
@@ -42,43 +41,42 @@ pub struct Player;
 
 fn handle_player_input(
     mut player_query: Query<&mut Ball, With<Player>>,
-    mouse: Res<Input<MouseButton>>,
-    keyboard: Res<Input<KeyCode>>,
-    mut spawn_events: EventWriter<EnemyEvents>,
+    mouse: Res<ButtonInput<MouseButton>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut spawn_events: MessageWriter<EnemyEvents>,
     time: Res<Time>,
 ) {
-    let mut ball = player_query.single_mut();
+    let mut ball = player_query.single_mut().unwrap();
 
-    if keyboard.pressed(KeyCode::Up) {
-        ball.velocity_y += ball.speed_with_keyboard * time.delta_seconds();
+    if keyboard.pressed(KeyCode::ArrowUp) {
+        ball.velocity_y += ball.speed_with_keyboard * time.delta_secs();
     }
-    if keyboard.pressed(KeyCode::Down) {
-        ball.velocity_y -= ball.speed_with_keyboard * time.delta_seconds();
+    if keyboard.pressed(KeyCode::ArrowDown) {
+        ball.velocity_y -= ball.speed_with_keyboard * time.delta_secs();
     }
-    if keyboard.pressed(KeyCode::Left) {
-        ball.velocity_x -= ball.speed_with_keyboard * time.delta_seconds();
+    if keyboard.pressed(KeyCode::ArrowLeft) {
+        ball.velocity_x -= ball.speed_with_keyboard * time.delta_secs();
     }
-    if keyboard.pressed(KeyCode::Right) {
-        ball.velocity_x += ball.speed_with_keyboard * time.delta_seconds();
+    if keyboard.pressed(KeyCode::ArrowRight) {
+        ball.velocity_x += ball.speed_with_keyboard * time.delta_secs();
     }
     if keyboard.just_pressed(KeyCode::Space) || mouse.just_pressed(MouseButton::Left) {
-        spawn_events.send(EnemyEvents::Spawn);
+        spawn_events.write(EnemyEvents::Spawn);
     }
 
     // mobile with accelerometer
-    // todo fix ball/wall collision - velocity should be incremented ?
     let orientation_x = get_orientation_x();
     let orientation_y = get_orientation_y();
     if orientation_x != 0.0 && orientation_y != 0.0 {
-        ball.velocity_x += orientation_x * ball.speed_with_accelerometer * time.delta_seconds();
-        ball.velocity_y += orientation_y * ball.speed_with_accelerometer * time.delta_seconds();
+        ball.velocity_x += orientation_x * ball.speed_with_accelerometer * time.delta_secs();
+        ball.velocity_y += orientation_y * ball.speed_with_accelerometer * time.delta_secs();
     }
 }
 
 fn spawn_player(
     mut commands: Commands,
     ball_texture: Res<BallTexture>,
-    gamestate: Res<CurrentState<GameState>>,
+    gamestate: Res<State<GameState>>,
 ) {
     let player_ball_component = (
         Ball::new(
@@ -92,8 +90,8 @@ fn spawn_player(
     let player_entity = spawn_assets_sprite(
         &mut commands,
         &ball_texture,
-        1,
-        Color::rgb(0.4, 0.9, 0.9),
+        0,
+        Color::srgb(0.4, 0.9, 0.9),
         Vec3::new(0.0, 0.0, 900.0),
         Vec3::splat(PLAYER_SCALE),
     );
@@ -103,6 +101,5 @@ fn spawn_player(
         .insert(player_ball_component)
         .insert(Name::new("Player"));
 
-    // once the player is ready, lets start the game - if we need other resources, start game after spawning them
     start_game(commands, gamestate);
 }

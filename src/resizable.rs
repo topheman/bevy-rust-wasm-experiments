@@ -43,15 +43,15 @@ impl Default for Viewport {
 impl Plugin for ResizablePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Viewport { ..default() });
-        app.add_system(on_resize_system);
+        app.add_systems(Update, on_resize_system);
     }
 }
 
 fn on_resize_system(
-    mut resize_reader: EventReader<WindowResized>,
+    mut resize_reader: MessageReader<WindowResized>,
     mut viewport_res: ResMut<Viewport>,
 ) {
-    for e in resize_reader.iter() {
+    for e in resize_reader.read() {
         let viewport = viewport_res.as_mut();
         viewport.width = e.width;
         viewport.height = e.height;
@@ -59,12 +59,5 @@ fn on_resize_system(
         viewport.max_x = e.width / 2.0;
         viewport.min_y = -e.height / 2.0;
         viewport.max_y = e.height / 2.0;
-        // println!(
-        //     "{}",
-        //     format!(
-        //         "{:.1} x {:.1} | {} {}",
-        //         e.width, e.height, viewport.width, viewport.height
-        //     )
-        // );
     }
 }

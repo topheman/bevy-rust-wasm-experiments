@@ -53,7 +53,7 @@ A [Makefile](Makefile) is available with a list of tasks.
 rustup target install wasm32-unknown-unknown
 
 # Mandatory crates
-cargo install wasm-bindgen-cli@0.2.86 # cli for wasm-bindgen implementation shipped in Cargo.toml
+cargo install wasm-bindgen-cli@0.2.114 # cli for wasm-bindgen implementation shipped in Cargo.toml
 cargo install wasm-opt # cli that optimizes wasm payload
 
 # Optional crates for development

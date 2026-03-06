@@ -4,52 +4,60 @@ pub struct TexturePlugin;
 
 impl Plugin for TexturePlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system_to_stage(StartupStage::PreStartup, load_assets);
+        app.add_systems(PreStartup, load_assets);
     }
 }
 
 #[derive(Resource)]
-pub struct BallTexture(Handle<TextureAtlas>);
+pub struct BallTexture {
+    pub image: Handle<Image>,
+    pub layout: Handle<TextureAtlasLayout>,
+}
 
 pub fn spawn_assets_sprite(
     commands: &mut Commands,
     ball_texture: &BallTexture,
-    index: usize, // set to 1
+    index: usize,
     color: Color,
     translation: Vec3,
     scale: Vec3,
 ) -> Entity {
-    let mut sprite = TextureAtlasSprite::new(index);
-    sprite.color = color;
-
     return commands
-        .spawn(SpriteSheetBundle {
-            sprite,
-            texture_atlas: ball_texture.0.clone(),
-            transform: Transform {
+        .spawn((
+            Sprite {
+                image: ball_texture.image.clone(),
+                color,
+                texture_atlas: Some(TextureAtlas {
+                    layout: ball_texture.layout.clone(),
+                    index,
+                }),
+                ..default()
+            },
+            Transform {
                 translation,
                 scale,
                 ..default()
             },
-            ..default()
-        })
+        ))
         .id();
 }
 
 fn load_assets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let texture_handle = asset_server.load("ball-steel-no-shadow.png");
-    let texture_atlas = TextureAtlas::from_grid(
-        texture_handle,
-        Vec2::new(100.0, 100.0),
-        7,
+    let texture_handle: Handle<Image> = asset_server.load("ball-steel-no-shadow.png");
+    let layout = TextureAtlasLayout::from_grid(
+        UVec2::new(100, 117),
+        1,
         1,
         None,
-        Some(Vec2::new(-100.0, 0.0)),
+        None,
     );
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
-    commands.insert_resource(BallTexture(texture_atlas_handle));
+    let layout_handle = texture_atlas_layouts.add(layout);
+    commands.insert_resource(BallTexture {
+        image: texture_handle,
+        layout: layout_handle,
+    });
 }
